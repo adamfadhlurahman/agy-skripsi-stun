@@ -71,7 +71,7 @@ This skill enforces physical typography, complete front-to-back manuscript struc
   1. Never begin a sentence with `Sedangkan`, `Sehingga`, `Dan`, `Atau`, or `Konsekuensinya`.
   2. Never use `di mana`, `dimana`, or `yang mana` as relative connectors in declarative sentences.
   3. Use `antara lain` instead of `di antaranya`.
-  4. Italicize unassimilated foreign terms and introduce acronyms on first use.
+  4. **Foreign Terms & Italicization:** Never force awkward literal Indonesian translations for technical, accounting, public finance, or econometric terms that lack a natural KBBI equivalent (e.g., *tax holiday*, *revenue forgone*, *Pooled OLS*, *Fixed Effects*, *Random Effects*, *System GMM*, *robustness check*). Keep the original English term and **always italicize it** everywhere in prose, lists, and table cells (except assimilated KBBI loanwords, proper names/institutions, and code/symbol identifiers); optionally pair with a brief Indonesian gloss on first use if helpful. Introduce acronyms on first use.
   5. **Zero em-dashes (`—`) or en-dashes (`–`) in prose body** (en-dash allowed only in numeric ranges like `2023–2025` or page ranges).
   6. Use `jika`/`apabila` instead of `bila`, standard KTSP nasalization (`memengaruhi`, `menyintesis`, `mengubah`), and KBBI spelling (`analisis`, `risiko`, `efektivitas`, `standardisasi`, `tolok ukur`, `linear`, `objek`).
   7. No spaces inside parentheses: `(APBN)`.
