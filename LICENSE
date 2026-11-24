@@ -1,0 +1,35 @@
+# License & Terms of Use (AGY Thesis Starter Kit — STUN Edition)
+
+This document governs the **original components** created for this starter kit. All bundled third-party open-source skills remain governed by their respective original licenses as detailed in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+
+---
+
+## 1. Original Starter Kit Components
+
+Copyright © 2026 AGY Thesis Starter Kit Author.
+
+Applies to all original files listed in Section 1 of [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) (`AGENTS.md`, `GEMINI.md`, `README.md`, `PROJECT_STATUS.md`, `.agents/rules/`, `.agents/skills/thesis-autopilot/`, `.agents/skills/stun-thesis-writer/`, `scripts/`, `templates/Template_STUN_Blank.docx`, and `docs/`):
+
+### Permitted Use (Authorized Users)
+1. Use and customize this starter kit in full to research, draft, format, and export your own personal Thesis Proposal and Complete Thesis (including modifying scripts, templates, and configs for your own academic research).
+2. Publish and submit the resulting generated documents (`.docx`, `.pdf`, tables, and figures) as your own academic work.
+
+### Prohibited Use
+1. **No Commercial Reselling or Repackaging:** You may not resell, rent, sublicense, or commercially redistribute the original starter kit components as a standalone or competing paid product without prior written permission from the author.
+2. **No Attribution Removal:** You may not remove `LICENSE`, `THIRD_PARTY_NOTICES.md`, or any third-party `LICENSE` files inside the bundled skill directories.
+
+---
+
+## 2. Bundled Third-Party Open-Source Components (MIT & CC0 1.0)
+
+* **Humanizer Indonesia** (`.agents/skills/humanizer-indonesia/`) — **MIT License**, Copyright (c) 2026 Pribadi Mumpuni Adhi.
+* **AI Research Skills** (`gap-to-topic`, `research-design-helper`, `literature-triage-matrix`, `paper-review`, `paper-summarize`, and `research-hub/references/`) — **MIT License**, Copyright (c) 2026 Wenyu Chiou.
+* **EconAgentSkills** (`research-ideation`, `lit-review-assistant`, `working-with-data`, `python-panel-data`, `r-econometrics`, `stata-data-cleaning`, `stata-regression`, `econ-visualization`, and `.agents/AGENT_POLICY.md`) — **CC0 1.0 Universal (Public Domain)**.
+
+Nothing in Section 1 restricts any rights granted under the respective MIT and CC0 1.0 licenses for those third-party components. Full license texts and upstream links are provided in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+
+---
+
+## 3. Academic Integrity Disclaimer
+
+This kit is a research workflow and formatting automation tool. The student author remains solely responsible for data accuracy, analytical validity, original synthesis, and compliance with institutional academic integrity and similarity standards.

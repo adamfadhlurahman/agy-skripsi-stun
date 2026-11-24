@@ -1,0 +1,78 @@
+{
+  "mahasiswa": {
+    "nama": "[Full Student Name]",
+    "npm": "[Student ID / NPM]",
+    "kampus": "POLITEKNIK KEUANGAN NEGARA STAN",
+    "header_lines": [
+      "KEMENTERIAN KEUANGAN REPUBLIK INDONESIA",
+      "BADAN PENDIDIKAN DAN PELATIHAN KEUANGAN",
+      "POLITEKNIK KEUANGAN NEGARA STAN",
+      "TANGERANG SELATAN"
+    ],
+    "kota_kampus": "Tangerang Selatan",
+    "jenjang_gelar": "Sarjana Terapan",
+    "prodi": "DIPLOMA IV AKUNTANSI SEKTOR PUBLIK",
+    "bidang_studi": "[Field of Study / Concentration]",
+    "tahun_lulus": "2027"
+  },
+  "pembimbing": {
+    "ketua_prodi": "[Program Chair Name]",
+    "nip_kaprodi": "[Program Chair NIP]",
+    "dosen_pembimbing": "[Advisor Name]",
+    "nip_pembimbing": "[Advisor NIP]",
+    "dosen_penilai_2": "............................................",
+    "nip_penilai_2": "......................................",
+    "dosen_penilai_3": "............................................",
+    "nip_penilai_3": "......................................"
+  },
+  "skripsi": {
+    "archetype": "quantitative",
+    "judul": "[FULL THESIS TITLE]",
+    "italic_phrases_in_title": [],
+    "kata_kunci": "[keyword 1, keyword 2, keyword 3]",
+    "include_lulus_page": true,
+    "include_keaslian_page": true,
+    "abstrak_file": "03. Drafts/Abstrak.md",
+    "kata_pengantar_items": [
+      "1. [Advisor Name] selaku Dosen Pembimbing yang telah meluangkan waktu, tenaga, dan pikiran dalam memberikan bimbingan kepada penulis.",
+      "2. [Program Chair Name] selaku Ketua Program Studi atas dukungan akademik selama masa perkuliahan.",
+      "3. Bapak dan Ibu Dosen Politeknik Keuangan Negara STAN yang telah membekali ilmu pengetahuan kepada penulis.",
+      "4. Orang tua, keluarga, dan rekan-rekan mahasiswa yang senantiasa memberikan dukungan moral dan doa."
+    ]
+  },
+  "zotero": {
+    "user_id": "0",
+    "collection_key": "",
+    "locale": "id-ID",
+    "style": "http://www.zotero.org/styles/apa",
+    "map_file": "03. Drafts/zotero_map.json",
+    "citation_specs_file": "03. Drafts/citation_specs.json"
+  },
+  "paths": {
+    "template_docx": "templates/Template_Proposal_PKN_STAN_Blank.docx",
+    "output_proposal_docx": "04. Output DOCX/Proposal_Thesis.docx",
+    "output_skripsi_docx": "04. Output DOCX/Complete_Thesis.docx",
+    "chapters": [
+      {"num": 1, "label": "BAB I", "title": "PENDAHULUAN", "md": "03. Drafts/Bab I - Pendahuluan.md"},
+      {"num": 2, "label": "BAB II", "title": "LANDASAN TEORI", "md": "03. Drafts/Bab II - Landasan Teori.md"},
+      {"num": 3, "label": "BAB III", "title": "METODE PENELITIAN", "md": "03. Drafts/Bab III - Metode Penelitian.md"},
+      {"num": 4, "label": "BAB IV", "title": "HASIL PENELITIAN DAN PEMBAHASAN", "md": "03. Drafts/Bab IV - Hasil Penelitian dan Pembahasan.md"},
+      {"num": 5, "label": "BAB V", "title": "SIMPULAN DAN SARAN", "md": "03. Drafts/Bab V - Simpulan dan Saran.md"}
+    ],
+    "proposal_appendices": [],
+    "appendices": [],
+    "figures": {},
+    "table_col_widths": {}
+  },
+  "riwayat_hidup": {
+    "enabled": true,
+    "ttl": "[Kota, DD Bulan YYYY]",
+    "jenis_kelamin": "[Laki-Laki / Perempuan]",
+    "alamat": "[Alamat Lengkap]",
+    "kontak": "[Nomor HP / Email]",
+    "pendidikan": [
+      ["Politeknik Keuangan Negara STAN", "2027"]
+    ],
+    "organisasi": []
+  }
+}
