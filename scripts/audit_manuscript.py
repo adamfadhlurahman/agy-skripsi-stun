@@ -93,9 +93,16 @@ def audit_markdown(md_path: pathlib.Path, against_paths: list[pathlib.Path], is_
                     filtered.append((m.group(0), clean[max(0, m.start() - 25) : min(len(clean), m.end() + 25)].replace("\n", " ")))
         elif label == "Stray markdown backtick/asterisk/dollar":
             filtered = []
+            eq_spans = [
+                (em.start(), em.end())
+                for em in re.finditer(r"(?m)^\$\$.+?\$\$\s+\(\d+\.\d+\)\s*$", clean)
+            ]
             for m in matches:
                 ch = m.group(0)
-                if ch == "$" and clean[max(0, m.start() - 2) : m.start() + 1] == "US$":
+                if ch == "$" and (
+                    clean[max(0, m.start() - 2) : m.start() + 1] == "US$"
+                    or any(s0 <= m.start() < s1 for s0, s1 in eq_spans)
+                ):
                     continue
                 filtered.append((ch, clean[max(0, m.start() - 25) : min(len(clean), m.end() + 25)].replace("\n", " ")))
         else:

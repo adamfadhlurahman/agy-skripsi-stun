@@ -249,6 +249,20 @@ class CitationEngine:
             append_non_citation_markdown(paragraph, text[pos:], size_pt=size_pt, base_bold=base_bold, base_italic=base_italic)
 
 
+def smart_title_id(text: str) -> str:
+    keep_upper = {"STAN", "PKN", "STUN", "RI", "II", "III", "IV", "VI", "VII", "VIII", "IX", "MKN", "ASP", "MAP", "D-IV", "D-III"}
+    out = []
+    for tok in str(text).split():
+        clean_u = tok.upper()
+        if clean_u in keep_upper:
+            out.append(clean_u)
+        elif "-" in tok:
+            out.append("-".join(p.upper() if p.upper() in keep_upper else p.capitalize() for p in tok.split("-")))
+        else:
+            out.append(tok.capitalize())
+    return " ".join(out)
+
+
 def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root: pathlib.Path) -> None:
     src = ws_root / cfg["paths"]["template_docx"]
     parser = etree.XMLParser(remove_blank_text=False)
@@ -318,7 +332,7 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
         replace_p(children[4], [doc_type_lbl])
         replace_p(children[6], [skr["judul"].upper()], apply_italic=True)
         replace_p(children[8], ["Diajukan oleh:", mhs["nama"], f"NPM {mhs['npm']}"])
-        replace_p(children[13], [f"Guna Mencapai Gelar {jenjang} {mhs['prodi'].title()}"])
+        replace_p(children[13], [f"Guna Mencapai Gelar {jenjang} {smart_title_id(mhs['prodi'])}"])
         replace_p(children[14], [str(mhs["tahun_lulus"])])
 
         # Halaman Persetujuan
@@ -449,10 +463,12 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
 
         new_styles_xml = etree.tostring(styles_root, xml_declaration=True, encoding="UTF-8", standalone=True)
 
-        # Clean numbering levels 1..4 in abstractNumId=5 to latest STUN spec
+        # Clean numbering levels 1..4 in abstractNumId=5 to latest STUN spec, and clone per-chapter numIds (101..106)
         num_root = etree.fromstring(zin.read("word/numbering.xml"), parser)
+        abs5 = None
         for anum in num_root.findall(w("abstractNum")):
             if anum.get(w("abstractNumId")) == "5":
+                abs5 = anum
                 for lvl in anum.findall(w("lvl")):
                     ilvl = lvl.get(w("ilvl"))
                     if ilvl in ("1", "2"):
@@ -465,6 +481,36 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
                         set_sz(rpr, 24)
                         set_toggle(rpr, "b", False); set_toggle(rpr, "bCs", False)
                         set_toggle(rpr, "i", False); set_toggle(rpr, "iCs", False)
+        if abs5 is not None:
+            insert_pos = list(num_root).index(abs5) + 1
+            existing_abs_ids = {el.get(w("abstractNumId")) for el in num_root.findall(w("abstractNum"))}
+            existing_num_ids = {el.get(w("numId")) for el in num_root.findall(w("num"))}
+            for ch_idx in range(1, 7):
+                nid = str(100 + ch_idx)
+                if nid in existing_abs_ids or nid in existing_num_ids:
+                    continue
+                cloned = copy.deepcopy(abs5)
+                cloned.set(w("abstractNumId"), nid)
+                nsid = cloned.find(w("nsid"))
+                if nsid is not None:
+                    nsid.set(w("val"), f"5A70010{ch_idx}")
+                tmpl = cloned.find(w("tmpl"))
+                if tmpl is not None:
+                    tmpl.set(w("val"), f"5B70010{ch_idx}")
+                for lvl in cloned.findall(w("lvl")):
+                    ps = lvl.find(w("pStyle"))
+                    if ps is not None:
+                        lvl.remove(ps)
+                    lt = lvl.find(w("lvlText"))
+                    if lt is not None and lvl.get(w("ilvl")) in ("1", "2", "3", "4"):
+                        lt.set(w("val"), lt.get(w("val"), "").replace("%1", str(ch_idx)))
+                num_root.insert(insert_pos, cloned)
+                insert_pos += 1
+                num_el = etree.Element(w("num"))
+                num_el.set(w("numId"), nid)
+                abs_ref = etree.SubElement(num_el, w("abstractNumId"))
+                abs_ref.set(w("val"), nid)
+                num_root.append(num_el)
         new_num_xml = etree.tostring(num_root, xml_declaration=True, encoding="UTF-8", standalone=True)
 
         locale = zot.get("locale", "id-ID")
@@ -730,23 +776,24 @@ def add_kata_pengantar(doc, cfg: dict):
 
     p1 = doc.add_paragraph()
     p1.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    p1.paragraph_format.line_spacing = 2.0; p1.paragraph_format.first_line_indent = Cm(1.27)
+    p1.paragraph_format.line_spacing = 1.5; p1.paragraph_format.first_line_indent = Cm(1.27)
+    p1.paragraph_format.space_after = Pt(6)
     set_run_font(p1.add_run(
         f"Puji dan syukur penulis panjatkan ke hadirat Tuhan Yang Maha Esa atas rahmat-Nya sehingga karya ilmiah berjudul \"{skr['judul']}\" ini dapat diselesaikan. "
-        f"Skripsi ini disusun sebagai bagian dari syarat untuk meraih gelar {mhs.get('jenjang_gelar', 'Sarjana Terapan')} {mhs['prodi'].title()} pada {mhs.get('kampus', 'Politeknik Keuangan Negara STAN').title()}. "
+        f"Skripsi ini disusun sebagai bagian dari syarat untuk meraih gelar {mhs.get('jenjang_gelar', 'Sarjana Terapan')} {smart_title_id(mhs['prodi'])} pada {smart_title_id(mhs.get('kampus', 'Politeknik Keuangan Negara STAN'))}. "
         "Ucapan terima kasih penulis sampaikan kepada:"
     ), size_pt=12)
 
     for item in skr.get("kata_pengantar_items", []):
         pi = doc.add_paragraph()
         pi.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        pi.paragraph_format.line_spacing = 2.0
+        pi.paragraph_format.line_spacing = 1.5; pi.paragraph_format.space_after = Pt(4)
         pi.paragraph_format.left_indent = Cm(1.90); pi.paragraph_format.first_line_indent = Cm(-0.63)
         set_run_font(pi.add_run(item), size_pt=12)
 
     pcl = doc.add_paragraph()
     pcl.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    pcl.paragraph_format.line_spacing = 2.0; pcl.paragraph_format.first_line_indent = Cm(1.27)
+    pcl.paragraph_format.line_spacing = 1.5; pcl.paragraph_format.first_line_indent = Cm(1.27)
     set_run_font(pcl.add_run("Semoga skripsi ini dapat memberikan manfaat bagi pengembangan ilmu pengetahuan dan praktik kebijakan keuangan publik di Indonesia."), size_pt=12)
 
     psig = doc.add_paragraph()
@@ -829,7 +876,14 @@ def add_toc_pages(doc, cfg: dict, mode: str, ws_root: pathlib.Path):
 def add_booktabs_table(doc, rows_md, widths_cm, cit_engine: CitationEngine):
     n_rows, n_cols = len(rows_md), len(rows_md[0])
     if not widths_cm or len(widths_cm) != n_cols:
-        widths_cm = [round(14.0 / n_cols, 2)] * n_cols
+        col_lens = [
+            max([len(re.sub(r"[*_`]", "", r[c])) for r in rows_md] + [4])
+            for c in range(n_cols)
+        ]
+        raw_w = [max(1.3, min(6.2, float(l) ** 0.72)) for l in col_lens]
+        tot_w = sum(raw_w) or 1.0
+        widths_cm = [round(14.0 * w_i / tot_w, 2) for w_i in raw_w]
+        widths_cm[-1] = round(14.0 - sum(widths_cm[:-1]), 2)
     tbl = doc.add_table(rows=n_rows, cols=n_cols)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     tbl.autofit = False
@@ -886,18 +940,25 @@ def add_seq_caption(doc, style_name, prefix_text, seq_name, title_md):
     return p
 
 
-def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine, ws_root: pathlib.Path) -> None:
+def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine, ws_root: pathlib.Path, ch_num: int | None = None) -> None:
     body = re.sub(r"^---\n.*?\n---\n+", "", raw_md, flags=re.S)
     lines = body.splitlines()
     fig_map = cfg["paths"].get("figures", {})
     col_map = cfg["paths"].get("table_col_widths", {})
 
     heading_style_map = [
-        ("##### ", "Jusul Subbagian bagian-subbab", False),
-        ("#### ", "Judul Bagian Bagian-Subbab", False),
-        ("### ", "Judul Bagian Subbab", True),
-        ("## ", "Judul Subbab", True),
+        ("##### ", "Jusul Subbagian bagian-subbab", False, 4),
+        ("#### ", "Judul Bagian Bagian-Subbab", False, 3),
+        ("### ", "Judul Bagian Subbab", True, 2),
+        ("## ", "Judul Subbab", True, 1),
     ]
+
+    def _next_nonempty(idx: int) -> str:
+        for k in range(idx + 1, len(lines)):
+            t = lines[k].strip()
+            if t:
+                return t
+        return ""
 
     i = 0
     in_code = False
@@ -917,11 +978,19 @@ def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine
             continue
 
         matched_heading = False
-        for prefix_h, st_name, is_bold_h in heading_style_map:
+        for prefix_h, st_name, is_bold_h, ilvl_h in heading_style_map:
             if s.startswith(prefix_h):
                 clean_h = re.sub(r"^\d+(?:\.\d+)+\s+", "", s[len(prefix_h):].strip())
                 p = doc.add_paragraph()
                 p.style = doc.styles[st_name]
+                if ch_num is not None and 1 <= ch_num <= 6:
+                    ppr = get_or_add_xsd(p._p, qn("w:pPr"), XSD_PPR_ORDER)
+                    npr = get_or_add_xsd(ppr, qn("w:numPr"), XSD_PPR_ORDER)
+                    for old_ch in list(npr):
+                        npr.remove(old_ch)
+                    il_el = OxmlElement("w:ilvl"); il_el.set(qn("w:val"), str(ilvl_h))
+                    nid_el = OxmlElement("w:numId"); nid_el.set(qn("w:val"), str(100 + ch_num))
+                    npr.append(il_el); npr.append(nid_el)
                 p.paragraph_format.keep_with_next = True
                 append_non_citation_markdown(p, clean_h, size_pt=12, base_bold=is_bold_h)
                 matched_heading = True
@@ -966,7 +1035,7 @@ def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine
             continue
 
         tbl_m = re.match(r"^Tabel\s+([IVX]+)\.(\d+)\s+(.*)$", s)
-        if tbl_m:
+        if tbl_m and _next_nonempty(i).startswith("|"):
             skip_next_fig_md = False
             rom, num, title_rest = tbl_m.groups()
             active_tbl_num = f"{rom}.{num}"
@@ -989,7 +1058,7 @@ def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine
             continue
 
         fig_m = re.match(r"^Gambar\s+([IVX]+)\.(\d+)\s+(.*)$", s)
-        if fig_m:
+        if fig_m and (f"{fig_m.group(1)}.{fig_m.group(2)}" in fig_map or _next_nonempty(i).startswith("![")):
             rom, num, title_rest = fig_m.groups()
             fkey = f"{rom}.{num}"
             add_seq_caption(doc, "Gambar", f"Gambar {rom}.", f"Gambar_{rom}", title_rest)
@@ -1058,7 +1127,7 @@ def render_chapter(doc, ch_cfg: dict, cfg: dict, cit_engine: CitationEngine, ws_
     configure_chapter_section(sec, start_decimal=1 if is_first else None, first_page_bottom=True)
     add_top_spacer(doc)
     add_judul_bab(doc, ch_cfg["label"], ch_cfg["title"])
-    render_markdown_body(doc, md_path.read_text(encoding="utf-8"), cfg, cit_engine, ws_root)
+    render_markdown_body(doc, md_path.read_text(encoding="utf-8"), cfg, cit_engine, ws_root, ch_num=ch_cfg.get("num"))
 
 
 class BibHTMLParser(HTMLParser):
@@ -1103,11 +1172,57 @@ def add_daftar_pustaka(doc, cfg: dict, zmap: dict, cited_keys: list[str]):
                 p.feed(html.unescape(eh))
                 bib_runs_list.append(p.segments)
         except Exception:
-            for k in keys:
+            def _fmt_authors_apa(authors: list[dict]) -> str:
+                parts = []
+                for a in authors:
+                    fam = a.get("family") or a.get("literal") or ""
+                    giv = a.get("given") or ""
+                    inits = " ".join(f"{tok[0]}." for tok in re.split(r"[\s-]+", giv.strip()) if tok)
+                    parts.append(f"{fam}, {inits}".strip(", ") if fam and inits else fam)
+                if not parts:
+                    return ""
+                if len(parts) == 1:
+                    return parts[0]
+                if len(parts) <= 20:
+                    return ", ".join(parts[:-1]) + f", & {parts[-1]}"
+                return ", ".join(parts[:19]) + f", ... {parts[-1]}"
+
+            def _item_sort_key(k_item: str) -> str:
+                import unicodedata
+                it_s = zmap.get("items", {}).get(k_item, {})
+                auths = it_s.get("author", [])
+                raw_k = (auths[0].get("family") or auths[0].get("literal") or it_s.get("title", k_item)) if auths else it_s.get("title", k_item)
+                nfkd = unicodedata.normalize("NFKD", raw_k)
+                return "".join(ch for ch in nfkd if not unicodedata.combining(ch)).lower()
+
+            for k in sorted(set(keys), key=_item_sort_key):
                 it = zmap.get("items", {}).get(k, {})
                 title = it.get("title", k)
                 yr = str(it.get("issued", {}).get("date-parts", [[""]])[0][0])
-                bib_runs_list.append([(f"{title} ({yr}).", False, False)])
+                auth_str = _fmt_authors_apa(it.get("author", []))
+                journal = it.get("container-title", "")
+                vol = str(it.get("volume", "")).strip()
+                iss = str(it.get("issue", "")).strip()
+                page = str(it.get("page", "")).strip()
+                doi = str(it.get("DOI", "")).strip()
+                url = str(it.get("URL", "")).strip()
+                segs: list[tuple[str, bool, bool]] = []
+                prefix = f"{auth_str} ({yr}). {title}." if auth_str else f"{title} ({yr})."
+                segs.append((prefix, False, False))
+                if journal:
+                    segs.append((f" {journal}", False, True))
+                    if vol:
+                        segs.append((f", {vol}", False, True))
+                    if iss:
+                        segs.append((f"({iss})", False, False))
+                    if page:
+                        segs.append((f", {page}", False, False))
+                    segs.append((".", False, False))
+                if doi:
+                    segs.append((f" https://doi.org/{doi}", False, False))
+                elif url:
+                    segs.append((f" {url}", False, False))
+                bib_runs_list.append(segs)
 
     if not bib_runs_list:
         p = doc.add_paragraph()
