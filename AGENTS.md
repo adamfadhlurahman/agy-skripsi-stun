@@ -24,7 +24,7 @@ Your job is to guide the user seamlessly from wherever they are—from zero idea
         ```powershell
         python scripts/setup_check.py
         ```
-        *(If required Python packages are missing and the user agrees, run `powershell -ExecutionPolicy Bypass -File scripts/setup.ps1` or `pip install -r requirements.txt`).*
+        *(If required Python packages are missing and the user agrees, run `powershell -ExecutionPolicy Bypass -File scripts/setup.ps1` on Windows or `bash scripts/setup.sh` on macOS/Linux, or `pip install -r requirements.txt`).*
      2. Summarize readiness in plain terms (e.g., *"Your Word builder and language checker are ready; Zotero isn't open yet, which we can turn on later when collecting papers"*).
      3. Ask **3 simple onboarding questions** to launch Phase 0 and Phase 1A:
         - **Full Name, NPM (Student ID), Department / Study Program** at **PKN STAN** (e.g., D-IV Akuntansi Sektor Publik, D-IV Manajemen Keuangan Negara, D-IV Manajemen Aset Publik, or another program)?

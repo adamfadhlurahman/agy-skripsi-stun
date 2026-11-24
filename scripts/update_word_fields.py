@@ -1,14 +1,23 @@
-"""Update all Word TOC, SEQ, PAGE fields via Microsoft Word COM on Windows."""
+"""Update all Word TOC, SEQ, PAGE fields via Microsoft Word COM on Windows (graceful skip on non-Windows)."""
 
 from __future__ import annotations
 
 import argparse
 import pathlib
+import shutil
 import subprocess
+import sys
 import tempfile
 
 
 def update_word_fields(docx_path: pathlib.Path) -> None:
+    if sys.platform != "win32" or not (shutil.which("powershell") or shutil.which("pwsh")):
+        print(
+            "[INFO] Automatic Word field update (Word COM) is only available on Windows with Microsoft Word Desktop. "
+            f"Open {docx_path.name} in Microsoft Word and press Select All -> F9 (or Update Field) to refresh page numbers."
+        )
+        return
+    shell_exe = shutil.which("powershell") or shutil.which("pwsh") or "powershell"
     docx_abs = str(docx_path.resolve())
     ps_script = f'''
 $ErrorActionPreference = "Stop"
@@ -40,11 +49,19 @@ try {{
         ps_path = pathlib.Path(tf.name)
     try:
         res = subprocess.run(
-            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ps_path)],
+            [shell_exe, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(ps_path)],
             capture_output=True,
             text=True,
-            check=True,
+            check=False,
         )
+        if res.returncode != 0:
+            print(
+                "[INFO] Word COM field refresh skipped (Microsoft Word Desktop unavailable or busy). "
+                f"Open {docx_path.name} in Word and press Ctrl+A -> F9 manually."
+            )
+            if res.stderr.strip():
+                print(f"       Detail: {res.stderr.strip().splitlines()[0]}")
+            return
         print(res.stdout.strip())
     finally:
         ps_path.unlink(missing_ok=True)

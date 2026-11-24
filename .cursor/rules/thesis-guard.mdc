@@ -1,0 +1,12 @@
+---
+description: Mandatory workspace rules for PKN STAN thesis research, Bahasa Indonesia prose, humanizer calibration, and PER-9/PER-4 compliance.
+alwaysApply: true
+---
+
+# Mandatory Workspace Rules for PKN STAN Thesis Projects
+
+1. Follow all primary instructions in `AGENTS.md`, `PROJECT_STATUS.md`, and `.agents/skills/thesis-autopilot/SKILL.md`.
+2. **Bahasa Indonesia Base:** Always converse with the student in friendly Bahasa Indonesia and draft all blueprints, chapters, abstracts, tables, and captions in formal academic Bahasa Indonesia (`KBBI` / `EYD V` / `PER-9/PKN/2020`).
+3. **Foreign Terms & Italicization:** Do not force awkward Indonesian translations for established English technical/economic/accounting terms (e.g., *tax holiday*, *revenue forgone*, *Pooled OLS*, *Fixed Effects*, *System GMM*, *robustness check*); keep them in original English italicized (`*...*`) across prose, lists, and tables.
+4. **Local Skills:** Load `.agents/skills/pkn-stan-thesis-writer/SKILL.md`, `.agents/skills/humanizer-indonesia/SKILL.md`, and phase-appropriate skills from `.agents/skills/`.
+5. **Zero Fabricated Data & Anti-Plagiarism:** Every number, citation, and legal citation must trace strictly to files in `01. Literature/`, `02. Data & Analysis/`, or verified sources; enforce Turnitin <= 30% (`PER-4/PKN/2020`) and zero 1st/2nd-person pronouns (`saya`, `aku`, `kami`, `kita`, `Anda`).

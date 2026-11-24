@@ -13,15 +13,27 @@ Designed specifically for **complete beginners with zero prior knowledge of AI a
 1. **Download or Clone This Folder** to your computer (e.g., `D:\My_Thesis\`):
    - Using Git: `git clone https://github.com/adamfadhlurahman/agy-skripsi-stun.git`
    - Or click **Code -> Download ZIP** and extract it.
-   - Open the folder in **Antigravity (AGY)** (`File -> Open Folder...`).
+   - Open the folder in **Antigravity (AGY)**, **Claude Code**, **OpenAI Codex CLI/App**, **Cursor**, or **Gemini CLI**.
+   - *(ChatGPT Web users: upload the ZIP and ask ChatGPT to extract it and follow `AGENTS.md`.)*
 2. **Install Core Prerequisites (One-Time Setup):**
    - Install **Python 3.10+** (check *"Add Python to PATH"* on Windows).
-   - *(Recommended)* Install **Zotero Desktop** so citations and your Reference List update live inside Microsoft Word.
-   - You don't need to run complicated commands yourself—AGY can check and set things up for you in your first chat.
-3. **Say Hello in the AGY Chat:**
+   - Run `scripts/setup.ps1` (Windows) or `bash scripts/setup.sh` (macOS/Linux)—or ask your AI agent to run it automatically.
+   - *(Recommended)* Install **Zotero Desktop** so citations and your Reference List update live inside Microsoft Word (works cleanly offline too with automatic APA 7th fallback).
+3. **Say Hello in Your Agent Chat:**
    > *"Halo, aku baru mau mulai menyusun skripsi dari nol dan belum punya ide topik sama sekali. Tolong cek kesiapan laptopku dan pandu langkah demi langkah."*
 4. **Follow the Guided Workflow (Phase 0 to Phase 7):**
-   Just answer AGY's plain-language questions. AGY handles literature mapping, gap testing, voice calibration, manuscript audits, and Word `.docx` generation automatically.
+   Just answer your agent's plain-language questions. The agent handles literature mapping, gap testing, voice calibration, manuscript audits, and Word `.docx` generation automatically.
+
+## Universal AI Agent Compatibility
+
+| AI Agent / Harness | Entry File Loaded Automatically | Compatibility Notes |
+|---|---|---|
+| **Antigravity (AGY)** | `AGENTS.md`, `GEMINI.md`, `.agents/rules/thesis-guard.md` | Full native automation (recommended). |
+| **Claude Code** | `CLAUDE.md` -> `@AGENTS.md` + `.agents/skills/` | Full workflow & local scripts supported. |
+| **OpenAI Codex CLI / App** | `AGENTS.md` + `.agents/skills/` | Full native discovery & terminal automation. |
+| **Cursor** | `AGENTS.md` + `.cursor/rules/thesis-guard.mdc` | Full native rule & skill workflow. |
+| **Gemini CLI** | `GEMINI.md` + `AGENTS.md` + `.agents/skills/` | Full native workspace discovery. |
+| **ChatGPT Web (Code Sandbox)** | Upload ZIP + prompt *"Follow `AGENTS.md`"* | Builds full `.docx` on Linux sandbox; refresh TOC manually (`Ctrl+A -> F9`) in Word afterward. |
 
 ---
 
