@@ -99,11 +99,13 @@ Activate **`lit-review-assistant`**, **`literature-triage-matrix`**, and **`pape
        python scripts/build_zotero_map.py --list-collections
        python scripts/build_zotero_map.py --collection-name "Skripsi" --out "03. Drafts/zotero_map.json"
        ```
-     - **If Mendeley (Reference Manager / Desktop):** Export any papers found via `search_papers.py --export-ris "01. Literature/references_mendeley.ris"` for 1-click import into Mendeley, OR import the student's existing Mendeley `.bib`/`.ris` export directly into the thesis map:
+     - **If Mendeley (Reference Manager / Desktop):** Export any papers found via `search_papers.py --export-ris "01. Literature/references_mendeley.ris"` for 1-click import into Mendeley, OR read an unencrypted local Mendeley Desktop SQLite / existing `.bib` / `.ris` export into `zotero_map.json`:
        ```powershell
+       python scripts/build_zotero_map.py --mendeley-local --collection-name "Skripsi" --out "03. Drafts/zotero_map.json"
+       # or from exported BibTeX / RIS:
        python scripts/build_zotero_map.py --bib "01. Literature/library.bib" --provider mendeley --out "03. Drafts/zotero_map.json"
        ```
-       *(Supports `--ris` too; `build_thesis_docx.py` automatically adapts to `provider: "mendeley"` with clean APA 7th in-text citations and `DAFTAR PUSTAKA`, without Zotero-only XML).*
+       *(Supports `--ris` too; and if `mendeley-mcp` is configured by the user, it can be queried directly via MCP. `build_thesis_docx.py` adapts automatically to `provider: "mendeley"` with clean APA 7th in-text citations and `DAFTAR PUSTAKA`).*
      - **If neither manager is installed:** `scripts/search_papers.py --export-zotero "03. Drafts/zotero_map.json"` populates verified CSL-JSON metadata directly, and `build_thesis_docx.py` formats a complete APA 7th bibliography automatically.
 3. Build **`.research/literature_matrix.md`** via `literature-triage-matrix` comparing author, year, method, data/sample, core findings, and limitations.
 4. *(Optional)* If `notebooklm-mcp` is active, upload key PDFs for cross-document fact verification.

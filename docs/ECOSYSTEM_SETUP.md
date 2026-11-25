@@ -41,13 +41,17 @@ This starter kit supports **both Zotero and Mendeley** (plus a zero-manager APA 
 4. Create one dedicated collection for your thesis (e.g., `Thesis`), then run `scripts/setup_check.py` to confirm connectivity.
 
 ### Option B — Mendeley (Mendeley Reference Manager / Mendeley Desktop)
-1. Store your papers inside a collection in **Mendeley** (or ask your agent to run `scripts/search_papers.py --export-ris "01. Literature/references_mendeley.ris"` so you can import them into Mendeley in 1 click).
-2. Export your Mendeley collection as **BibTeX (`.bib`)** or **RIS (`.ris`)**, then ask your agent to run:
-   ```powershell
-   python scripts/build_zotero_map.py --bib "01. Literature/library.bib" --provider mendeley --out "03. Drafts/zotero_map.json"
-   ```
-   *(Or `--ris "01. Literature/library.ris"`).*
-3. `build_thesis_docx.py` automatically matches every in-text APA 7th citation against your Mendeley export and builds a complete, alphabetically sorted APA 7th Reference List (`DAFTAR PUSTAKA`) cleanly—without injecting broken Zotero field codes. *(Note: Modern `Mendeley Cite` for Word 365 uses private Microsoft cloud Content Controls tied to your logged-in Elsevier session, so offline `.docx` generation outputs verified clean APA 7th text & bibliography matching your exact Mendeley library).*
+1. **Store or export references:**
+   - **Legacy Mendeley Desktop (unencrypted local SQLite):** Ask your agent to read your local Mendeley Desktop database directly with zero manual export:
+     ```powershell
+     python scripts/build_zotero_map.py --mendeley-local --collection-name "Skripsi" --out "03. Drafts/zotero_map.json"
+     ```
+   - **Modern Mendeley Reference Manager (or encrypted Desktop builds):** Export your Mendeley collection as **BibTeX (`.bib`)** or **RIS (`.ris`)**, then run:
+     ```powershell
+     python scripts/build_zotero_map.py --bib "01. Literature/library.bib" --provider mendeley --out "03. Drafts/zotero_map.json"
+     ```
+     *(And use `scripts/search_papers.py --export-ris "01. Literature/references_mendeley.ris"` for 1-click import into Mendeley).*
+2. `build_thesis_docx.py` automatically matches every in-text APA 7th citation against your Mendeley library and builds an alphabetically sorted `DAFTAR PUSTAKA` cleanly without broken Zotero field codes. *(Modern `Mendeley Cite` for Word 365 uses private Elsevier cloud Content Controls, so offline `.docx` generation outputs clean APA 7th text & bibliography matching your Mendeley library).*
 
 ---
 
@@ -55,8 +59,20 @@ This starter kit supports **both Zotero and Mendeley** (plus a zero-manager APA 
 
 Even **without any MCP server**, your AI agent can already find real peer-reviewed papers via `scripts/search_papers.py` (OpenAlex & CrossRef), search regulations via web search, and read local PDFs in `01. Literature/`.
 
-If you want extra direct API integrations inside Antigravity (`~/.gemini/config/mcp_config.json`) or Claude Code (`.mcp.json`), you may optionally install these external MCP servers later:
+If you want direct cloud/chat integrations inside Antigravity (`~/.gemini/config/mcp_config.json`) or Claude Code (`.mcp.json`), you may optionally install these open-source MCP servers:
 
 1. **`paper-search`** (`https://github.com/openags/paper-search-mcp`) — Extended multi-database search (arXiv, Semantic Scholar, CrossRef, OpenAlex, PubMed, SSRN).
 2. **`zotero`** (`https://github.com/54yyyu/zotero-mcp`) — Read/write Zotero collections, items, tags, and annotations directly from chat.
-3. **`openecon-data`** / **`notebooklm-mcp`** — Optional macro-economic time-series API and NotebookLM cross-document Q&A (requires external MCP installation/auth).
+3. **`mendeley-mcp`** (`https://github.com/pallaprolus/mendeley-mcp`, MIT License) — Read/write Mendeley Reference Manager collections, abstracts, highlights, and BibTeX exports directly from chat (`uv tool install mendeley-mcp`; requires registering an OAuth app at `https://dev.mendeley.com/myapps.html` with `http://localhost:8585/callback` to obtain `MENDELEY_CLIENT_ID`, `MENDELEY_CLIENT_SECRET`, and `MENDELEY_REFRESH_TOKEN`). Example snippet for `mcp_config.json`:
+   ```json
+   "mendeley": {
+     "command": "uvx",
+     "args": ["mendeley-mcp"],
+     "env": {
+       "MENDELEY_CLIENT_ID": "YOUR_CLIENT_ID",
+       "MENDELEY_CLIENT_SECRET": "YOUR_CLIENT_SECRET",
+       "MENDELEY_REFRESH_TOKEN": "YOUR_REFRESH_TOKEN"
+     }
+   }
+   ```
+4. **`openecon-data`** / **`notebooklm-mcp`** — Optional macro-economic time-series API and NotebookLM cross-document Q&A (requires external MCP installation/auth).
