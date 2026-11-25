@@ -63,8 +63,13 @@ Your AI agent detects what you already have (or asks in the first chat) and **au
 * `04. Output DOCX/` — Built `Proposal_Thesis.docx` and `Complete_Thesis.docx` files.
 * `05. Voice Reference/` — Place 1–2 of your own earlier essays/papers here for style calibration.
 * `.agents/skills/` — **16 local AGY skills pre-bundled** out of the box (no manual plugin installation required).
-* `scripts/` — Ready-to-run Python utilities (`search_papers.py` for OpenAlex/CrossRef + OA PDFs, `build_zotero_map.py` for hybrid Zotero & Mendeley `.bib`/`.ris`, voice extractor, manuscript auditor, `.docx` builder, and verifier).
+* `scripts/` — Ready-to-run Python utilities (`search_papers.py` for OpenAlex/CrossRef + OA PDFs, `build_zotero_map.py` for hybrid Zotero & Mendeley `.bib`/`.ris`/SQLite, `sync_notion.py` for optional Notion Research Dashboard sync, voice extractor, manuscript auditor, `.docx` builder, and verifier).
 * `templates/` — Clean blank Word template conforming to the latest STUN formatting standards.
+
+## Optional Knowledge Hub Integrations
+
+* **Bundled Notion Research Dashboard:** Connect your duplicated purple Notion Research Template (`scripts/sync_notion.py` or Notion MCP) so deep journal dissections (`Matrix Literature`), statutes/datasets (`Non-Research Documents`), TRACC AI logs, and `Cited in Draft` progress bars sync automatically during Phase 2–7.
+* **Obsidian Vault:** Optionally mirror `[[wikilink]]` literature notes and your Blueprint directly into your local Obsidian vault.
 
 ---
 

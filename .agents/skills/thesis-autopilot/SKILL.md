@@ -107,8 +107,12 @@ Activate **`lit-review-assistant`**, **`literature-triage-matrix`**, and **`pape
        ```
        *(Supports `--ris` too; and if `mendeley-mcp` is configured by the user, it can be queried directly via MCP. `build_thesis_docx.py` adapts automatically to `provider: "mendeley"` with clean APA 7th in-text citations and `DAFTAR PUSTAKA`).*
      - **If neither manager is installed:** `scripts/search_papers.py --export-zotero "03. Drafts/zotero_map.json"` populates verified CSL-JSON metadata directly, and `build_thesis_docx.py` formats a complete APA 7th bibliography automatically.
-3. Build **`.research/literature_matrix.md`** via `literature-triage-matrix` comparing author, year, method, data/sample, core findings, and limitations.
-4. *(Optional)* If `notebooklm-mcp` is active, upload key PDFs for cross-document fact verification.
+3. **Build `.research/literature_matrix.md`** via `literature-triage-matrix` comparing author, year, method, data/sample, core findings, and limitations.
+4. **Optional Notion Purple Dashboard & Obsidian Vault Sync (Bedah Jurnal):**
+   - If the student opted into **Notion** or **Obsidian** in Phase 0, activate **`.agents/skills/notion-research-sync/SKILL.md`**:
+     - Populate `[DB] — Matrix Literature` for every dissected peer-reviewed paper (including `Grade`, `Tier`, `Read Status: "Extracted"`, `Evidence Role`, `Stance`, `Background`..`Research Contribution`, `Topic`, `Related Research`, plus the 3-bullet `Reading & Appraisal Notes` callout), push statutes/reports/datasets to `[DB] — Non-Research Documents`, and update `Active Research` `Stage` to `"2. Lit. Review"` (via Notion MCP if present, otherwise `python scripts/sync_notion.py`).
+     - If Obsidian Vault is connected, mirror structured `[[wikilink]]` Markdown literature notes into `<obsidian_vault_path>\Skripsi - <Short Title>\`.
+5. *(Optional)* If `notebooklm-mcp` is active, upload key PDFs for cross-document fact verification.
 
 ---
 
@@ -162,6 +166,7 @@ Then lock **`03. Drafts/Blueprint Skripsi.md`** (written in Bahasa Indonesia) as
    python scripts/build_thesis_docx.py --config thesis_config.json --mode proposal
    python scripts/verify_thesis_docx.py --config thesis_config.json --mode proposal
    ```
+   *(If Notion is connected: update `Stage` to `"4. Drafting"` and run `python scripts/sync_notion.py mark-cited --config thesis_config.json` so cited papers flip to `"Cited in Draft"` and the Notion dashboard progress bar updates automatically).*
 
 ---
 
@@ -191,6 +196,6 @@ Then lock **`03. Drafts/Blueprint Skripsi.md`** (written in Bahasa Indonesia) as
    ```
 3. Guide the student through the final Word checklist in simple terms:
    - Open `04. Output DOCX/Complete_Thesis.docx` in Microsoft Word.
-   - Click the **Zotero** tab -> **Refresh** to activate all live citations and the Reference List.
-   - Press `Ctrl+A` then `F9` (*Update entire table*) if page numbers need one final refresh after Zotero updates.
+   - If using **Zotero**: click the **Zotero** tab -> **Refresh** to activate live fields, then press `Ctrl+A` + `F9`. If using **Mendeley**, all APA 7th citations and `DAFTAR PUSTAKA` are already cleanly formatted (press `Ctrl+A` + `F9` if page numbers need refresh).
+   - *(If Notion connected: update `Stage` to `"5. Review/Submitted"`, run `sync_notion.py mark-cited`, and log final TRACC audit to `[DB] — AI Disclosure Log`).*
    - Visually inspect chapter start pages (7.5 cm top margin, bottom-center page number), approval/statement pages, tables, and figures, and walk through [`docs/DEFENSE_CHECKLIST.md`](./../../docs/DEFENSE_CHECKLIST.md) before submitting to the academic portal and Turnitin (`PER-4/PKN/2020`).

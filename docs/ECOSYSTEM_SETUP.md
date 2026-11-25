@@ -75,4 +75,21 @@ If you want direct cloud/chat integrations inside Antigravity (`~/.gemini/config
      }
    }
    ```
-4. **`openecon-data`** / **`notebooklm-mcp`** — Optional macro-economic time-series API and NotebookLM cross-document Q&A (requires external MCP installation/auth).
+## 5. Optional Knowledge Hub Sync (Bundled Notion Research Template OR Obsidian Vault)
+
+During onboarding, your AI agent asks whether you want to connect a personal knowledge base (strictly optional):
+
+### A. Notion Research Dashboard (Bundled Purple Template)
+1. Duplicate the bundled **Notion Research Dashboard** template into your own Notion workspace.
+2. **Option 1 (With Notion MCP):** Connect Notion in your AI client (`notion` / `notion-local` MCP) and paste your duplicated dashboard URL in chat.
+3. **Option 2 (Zero-MCP via `scripts/sync_notion.py`):**
+   - Create a free internal integration at `https://www.notion.so/my-integrations` and copy the token (`ntn_...`).
+   - On your duplicated Notion dashboard page, click **`...` -> Connections -> Connect to** your integration.
+   - Put `NOTION_TOKEN=ntn_...` inside a local `.env` file (never shared or committed—already in `.gitignore`), then paste your dashboard URL to your agent so it runs:
+     ```powershell
+     python scripts/sync_notion.py discover --page "<YOUR_NOTION_PAGE_URL>" --config thesis_config.json
+     ```
+   - During **Phase 2 (Journal Dissection)** and **Phases 5–7**, your agent syncs all dissected journal fields (`Grade`, `Tier`, `Evidence Role`, `Stance`, `Method`, `Key Findings`, `Gaps`, `Reading & Appraisal Notes`), non-research documents, TRACC AI logs, and flips `Read Status` to `Cited in Draft` automatically.
+
+### B. Obsidian Vault Sync
+- Share your local Obsidian Vault folder path (e.g., `D:\Notes\MyVault`) during Phase 0 so your agent saves `[[wikilink]]` Markdown literature notes, the Literature Matrix, and the Blueprint directly into a subfolder in your vault.

@@ -12,7 +12,7 @@ Because bundled skills live in `.agents/skills/` (shared across Antigravity, Cod
 - **PKN STAN Formatting & Anti-Plagiarism Rules (`PER-9/PKN/2020`, `PER-4/PKN/2020`):** `.agents/skills/pkn-stan-thesis-writer/SKILL.md`
 - **Indonesian Prose & Voice Calibration:** `.agents/skills/humanizer-indonesia/SKILL.md` (metrics check: `python .agents/skills/humanizer-indonesia/scripts/metrik.py <file> --preset akademik`)
 - **Ideation & Gap Testing (Phase 1):** `.agents/skills/research-ideation/SKILL.md`, `.agents/skills/gap-to-topic/SKILL.md`
-- **Literature & Peer Review (Phases 2, 5, 6):** `.agents/skills/lit-review-assistant/SKILL.md`, `.agents/skills/literature-triage-matrix/SKILL.md`, `.agents/skills/paper-summarize/SKILL.md`, `.agents/skills/paper-review/SKILL.md`, `.agents/skills/research-hub/SKILL.md`
+- **Literature, Bedah Jurnal & Peer Review (Phases 2, 5, 6):** `.agents/skills/lit-review-assistant/SKILL.md`, `.agents/skills/literature-triage-matrix/SKILL.md`, `.agents/skills/paper-summarize/SKILL.md`, `.agents/skills/paper-review/SKILL.md`, `.agents/skills/notion-research-sync/SKILL.md` (optional Notion Purple Research Dashboard + Obsidian Vault sync)
 - **Study Design (Phase 4):** `.agents/skills/research-design-helper/SKILL.md`
 - **Data Analysis & Figures (Phase 6):** `.agents/skills/working-with-data/SKILL.md`, `.agents/skills/python-panel-data/SKILL.md`, `.agents/skills/r-econometrics/SKILL.md`, `.agents/skills/stata-data-cleaning/SKILL.md`, `.agents/skills/stata-regression/SKILL.md`, `.agents/skills/econ-visualization/SKILL.md`
 

@@ -75,5 +75,18 @@
       ["Politeknik Keuangan Negara STAN", "2027"]
     ],
     "organisasi": []
+  },
+  "integrations": {
+    "obsidian_vault_path": "",
+    "notion": {
+      "enabled": false,
+      "dashboard_page_id": "",
+      "research_list_db": "",
+      "topic_db": "",
+      "matrix_literature_db": "",
+      "non_research_db": "",
+      "ai_log_db": "",
+      "active_research_page_id": ""
+    }
   }
 }

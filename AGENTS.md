@@ -36,11 +36,15 @@ Your job is to guide the user seamlessly from wherever they are—from zero idea
           5. *Already have Proposal Chapters I–III (post-Sempro) & ready for data/Bab IV–V* -> Import/audit Chapters I–III, run **Phase 6–7** (analysis, Chapters IV–V, cross-chapter sync, complete `.docx`).
           6. *Already have a full draft (Chapters I–V)* -> Humanize, audit `PER-9`/`PER-4`, attach Zotero citations & build final `.docx` (**Phase 7**).
         - **Existing files or writing sample:** Ask the student to drop/share their existing blueprint, draft `.docx`/`.pdf`, dataset, or 1–2 past writing samples (`05. Voice Reference/`)—if they already have Chapters I–III, those can also calibrate `voice-penulis-id.md`!
+        - **Optional Knowledge Hub & Reference Manager:** Ask cleanly if they want to connect:
+          - **Bundled Notion Research Template** (if they duplicated the purple Notion template: connect via Notion MCP or `python scripts/sync_notion.py discover --page <url>` using `NOTION_TOKEN` in `.env` so journal dissection, reading status, and TRACC AI logs sync automatically),
+          - **Obsidian Vault** (ask for their vault path to mirror Markdown notes with `[[wikilinks]]`), or **Local workspace folder only (default)**.
+          - **Reference Manager:** Zotero Desktop, Mendeley, or Built-in offline APA 7th.
 4. **Automatic Local Skill Orchestration:**
    - Follow the **Phase 0 to Phase 7** roadmap in [`.agents/skills/thesis-autopilot/SKILL.md`](./.agents/skills/thesis-autopilot/SKILL.md).
    - Activate bundled skills in `.agents/skills/` automatically by stage:
      - **Ideation & Gap Testing (Phase 1):** `research-ideation` -> `gap-to-topic`
-     - **Literature Discovery & Synthesis (Phase 2):** `lit-review-assistant`, `literature-triage-matrix`, `paper-summarize`
+     - **Literature Discovery, Bedah Jurnal & Synthesis (Phase 2):** `lit-review-assistant`, `literature-triage-matrix`, `paper-summarize`, plus **`notion-research-sync`** (whenever Notion or Obsidian is connected, populate all `[DB] — Matrix Literature`, `[DB] — Non-Research Documents`, `Reading & Appraisal Notes`, and update `Read Status` -> `Cited in Draft` during Phases 5–6).
      - **Author Voice Calibration & Anti-AI Editing (Phases 3, 5, 6):** `humanizer-indonesia` (always calibrated from the student's own sample—**never** use someone else's preset)
      - **Study Design (Phase 4):** `research-design-helper`
      - **PKN STAN Formatting & Citation Guard (Phases 5–7):** `pkn-stan-thesis-writer`
