@@ -270,6 +270,9 @@ def cmd_push_literature(cfg_path: pathlib.Path, json_file: pathlib.Path, token: 
         if it.get("Evidence Role"):
             er = it["Evidence Role"] if isinstance(it["Evidence Role"], list) else [str(it["Evidence Role"])]
             props["Evidence Role"] = {"multi_select": [{"name": x} for x in er if x]}
+        if it.get("Section"):
+            sec = it["Section"] if isinstance(it["Section"], list) else [str(it["Section"])]
+            props["Section"] = {"multi_select": [{"name": x} for x in sec if x]}
         if res_page:
             props["Related Research"] = {"relation": [{"id": res_page}]}
         if topic_db and it.get("Topics"):

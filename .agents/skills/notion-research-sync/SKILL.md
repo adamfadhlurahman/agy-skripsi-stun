@@ -69,6 +69,7 @@ Populate this database **during Phase 2** whenever dissecting a peer-reviewed pa
   - `Tier` (select): `1 — Foundational` | `2 — Directly Relevant` | `3 — Recent`
   - `Read Status` (select): `To Screen` | `Reading` | `Extracted` | `Cited in Draft`
   - `Evidence Role` (multi_select): `Background/Gap` | `Theory/Framework` | `Methodology` | `Supporting Finding` | `Contradicting Finding`
+  - `Section` (multi_select, optional): `Bab I — Pendahuluan` | `Bab II — Tinjauan Pustaka` | `Bab III — Metode` | `Bab IV — Pembahasan` | `Bab V — Simpulan`
   - `Stance` (select): `Positive/Significant` | `Negative` | `Mixed/Conditional` | `Null/Insignificant` | `Conceptual/Review`
 - **Deep Journal Dissection Fields (rich_text — trace strictly to the actual PDF/abstract):**
   - `Background` — Problem context & motivation of the paper

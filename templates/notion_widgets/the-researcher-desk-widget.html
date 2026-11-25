@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Researcher — Focus & Research Desk</title>
+  <style>
+    :root {
+      --bg-page: transparent;
+      --surface: #ffffff;
+      --surface-soft: #faf8ff;
+      --surface-tint: #f4effe;
+      --border: rgba(135, 88, 246, 0.15);
+      --border-strong: rgba(135, 88, 246, 0.30);
+      --purple-deep: #6d3ef0;
+      --purple-core: #8758f6;
+      --purple-mid: #9d76fa;
+      --purple-soft: #bfa6fc;
+      --purple-pale: #ebe3ff;
+      --text-strong: #1e1b29;
+      --text-body: #3e3852;
+      --text-muted: #766f8c;
+      --text-faint: #9d96b3;
+      --font-display: "Palatino Linotype", "Book Antiqua", "Baskerville", Palatino, Georgia, serif;
+      --font-ui: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 11px;
+      --shadow-card: 0 10px 30px rgba(109, 62, 240, 0.06), 0 1px 3px rgba(30, 27, 41, 0.04);
+      --shadow-pill: 0 2px 8px rgba(109, 62, 240, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg-page);
+      font-family: var(--font-ui);
+      color: var(--text-strong);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      padding: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .widget-shell {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+      background:
+        radial-gradient(circle at 92% 6%, rgba(157, 118, 250, 0.14) 0%, rgba(191, 166, 252, 0.05) 30%, rgba(255, 255, 255, 0) 62%),
+        linear-gradient(180deg, #ffffff 0%, #fcfaff 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      padding: 18px 20px 18px;
+      overflow: hidden;
+      animation: shellEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .widget-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(135, 88, 246, 0.05) 0%, transparent 45%);
+    }
+
+    /* Top Header */
+    .top-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--purple-deep);
+      letter-spacing: 0.01em;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .status-badge:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .pulse-dot {
+      position: relative;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--purple-core);
+      box-shadow: 0 0 8px rgba(135, 88, 246, 0.65);
+    }
+
+    .pulse-dot::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(135, 88, 246, 0.45);
+      animation: pulseRing 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    }
+
+    .top-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--purple-deep);
+      background: var(--surface-tint);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn.is-active {
+      background: var(--surface-tint);
+      border-color: var(--purple-mid);
+      color: var(--purple-deep);
+    }
+
+    .icon-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.85;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Segmented Tabs with Sliding Indicator */
+    .tab-track {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 4px;
+      border-radius: 13px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .tab-glider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc((100% - 8px) / 4);
+      height: calc(100% - 8px);
+      border-radius: 9.5px;
+      background: var(--surface);
+      border: 1px solid rgba(135, 88, 246, 0.18);
+      box-shadow: var(--shadow-pill);
+      transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+
+    .tab-btn {
+      position: relative;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      padding: 7px 6px;
+      border-radius: 9px;
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.25s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--purple-deep);
+    }
+
+    .tab-btn.is-active {
+      color: var(--purple-deep);
+      font-weight: 600;
+    }
+
+    /* Views */
+    .tab-panel {
+      position: relative;
+      z-index: 2;
+      display: none;
+      animation: panelFade 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .tab-panel.is-active {
+      display: block;
+    }
+
+    /* TODAY VIEW */
+    .hero-clock-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 2px 2px 0;
+    }
+
+    .clock-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .clock-digits {
+      font-family: var(--font-ui);
+      font-size: clamp(34px, 6.2vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 0.95;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-strong);
+      display: inline-flex;
+      align-items: baseline;
+    }
+
+    .clock-colon {
+      display: inline-block;
+      color: var(--purple-core);
+      margin-inline: 2px;
+      animation: colonPulse 2s ease-in-out infinite;
+    }
+
+    .clock-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
+    .tz-chip {
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--surface-tint);
+      border: 1px solid rgba(135, 88, 246, 0.16);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--purple-deep);
+    }
+
+    .sec-digits {
+      font-size: 15px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--purple-core);
+      letter-spacing: 0.02em;
+    }
+
+    .date-right {
+      text-align: right;
+    }
+
+    .day-serif {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--purple-deep);
+      line-height: 1.15;
+    }
+
+    .date-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Section Header */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10.5px;
+      font-weight: 650;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    /* Lock-In Cards */
+    .lockin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 16px;
+    }
+
+    .lockin-card {
+      position: relative;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .lockin-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -80%;
+      width: 55%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(191, 166, 252, 0.22), transparent);
+      transform: skewX(-18deg);
+      transition: left 0.55s ease;
+    }
+
+    .lockin-card:hover {
+      background: var(--surface);
+      border-color: var(--purple-mid);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(109, 62, 240, 0.1);
+    }
+
+    .lockin-card:hover::after {
+      left: 130%;
+    }
+
+    .lockin-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple-deep);
+      margin-bottom: 3px;
+    }
+
+    .lockin-end {
+      font-size: 12.5px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-strong);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .lockin-arrow {
+      color: var(--purple-mid);
+      transition: transform 0.25s ease;
+    }
+
+    .lockin-card:hover .lockin-arrow {
+      transform: translateX(3px);
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 13px 0;
+    }
+
+    /* Progress Bars */
+    .progress-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .prog-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .prog-labels {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+    }
+
+    .prog-name {
+      color: var(--text-body);
+      font-weight: 500;
+    }
+
+    .prog-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .prog-detail {
+      color: var(--text-faint);
+      font-size: 11px;
+    }
+
+    .prog-pct {
+      color: var(--purple-deep);
+      font-weight: 650;
+      font-size: 11.5px;
+    }
+
+    .prog-track {
+      position: relative;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--purple-pale);
+      overflow: hidden;
+    }
+
+    .prog-fill {
+      position: relative;
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--purple-deep) 0%, var(--purple-core) 60%, var(--purple-mid) 100%);
+      transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .prog-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transform: translateX(-100%);
+      animation: barShimmer 3.8s ease-in-out infinite;
+    }
+
+    /* World / Deadline Converter */
+    .world-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .zone-pills {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .zone-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 3px 8px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-faint);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .zone-btn:hover {
+      color: var(--purple-deep);
+      background: var(--surface-soft);
+    }
+
+    .zone-btn.is-active {
+      color: var(--purple-deep);
+      background: var(--surface);
+      border-color: var(--border-strong);
+      box-shadow: 0 2px 6px rgba(109, 62, 240, 0.08);
+    }
+
+    .world-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .world-now {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: var(--text-body);
+    }
+
+    .world-now span {
+      color: var(--purple-deep);
+      margin-right: 4px;
+    }
+
+    .deadline-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .deadline-input {
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-strong);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .deadline-input:focus {
+      border-color: var(--purple-core);
+    }
+
+    .deadline-converted {
+      font-weight: 650;
+      color: var(--purple-deep);
+    }
+
+    /* FOCUS TAB */
+    .focus-wrap {
+      display: grid;
+      grid-template-columns: 168px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .ring-box {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-svg {
+      width: 160px;
+      height: 160px;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: var(--purple-pale);
+      stroke-width: 7;
+    }
+
+    .ring-fg {
+      fill: none;
+      stroke: url(#purpleGrad);
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-dasharray: 427.26;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .ring-center {
+      position: absolute;
+      text-align: center;
+    }
+
+    .ring-time {
+      font-size: 28px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      color: var(--text-strong);
+    }
+
+    .ring-mode {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--purple-core);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-top: 2px;
+    }
+
+    .focus-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mini-chip {
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      font-weight: 550;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mini-chip:hover {
+      border-color: var(--purple-mid);
+      color: var(--purple-deep);
+    }
+
+    .mini-chip.is-active {
+      background: var(--purple-deep);
+      border-color: var(--purple-deep);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(109, 62, 240, 0.25);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 8px 15px;
+      background: linear-gradient(135deg, var(--purple-deep), var(--purple-core));
+      color: #ffffff;
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(109, 62, 240, 0.24);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(109, 62, 240, 0.32);
+    }
+
+    .ghost-btn {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      background: var(--surface-soft);
+      color: var(--text-body);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ghost-btn:hover {
+      border-color: var(--purple-mid);
+      color: var(--purple-deep);
+      background: var(--surface-tint);
+    }
+
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--purple-deep);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-lbl {
+      font-size: 10.5px;
+      color: var(--text-faint);
+    }
+
+    /* CITE & PHRASE FORMS */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .txt-input {
+      width: 100%;
+      padding: 8px 11px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--text-strong);
+      font-family: var(--font-ui);
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .txt-input:focus {
+      border-color: var(--purple-core);
+      background: var(--surface);
+    }
+
+    .output-card {
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      margin-bottom: 9px;
+      transition: border-color 0.2s ease;
+    }
+
+    .output-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .output-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .output-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--purple-deep);
+    }
+
+    .copy-mini {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--purple-deep);
+      border-radius: 7px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-mini:hover {
+      background: var(--purple-deep);
+      color: #ffffff;
+      border-color: var(--purple-deep);
+    }
+
+    .output-body {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text-body);
+      word-break: break-word;
+    }
+
+    .phrase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    /* Settings Popover Drawer */
+    .settings-drawer {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: var(--surface-soft);
+      border: 1px solid var(--border-strong);
+      animation: panelFade 0.25s ease forwards;
+    }
+
+    .settings-drawer.is-open {
+      display: block;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .tiny-label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(14px);
+      background: var(--purple-deep);
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      box-shadow: 0 8px 20px rgba(109, 62, 240, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 20;
+    }
+
+    .toast.is-shown {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 560px) {
+      .focus-wrap {
+        grid-template-columns: 1fr;
+      }
+      .lockin-grid,
+      .field-grid,
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @keyframes shellEnter {
+      from { opacity: 0; transform: translateY(8px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.9); opacity: 0.75; }
+      75%, 100% { transform: scale(2.1); opacity: 0; }
+    }
+
+    @keyframes colonPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    @keyframes barShimmer {
+      0% { transform: translateX(-100%); }
+      55%, 100% { transform: translateX(220%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget-shell">
+    <!-- Top Status & Quick Icon Controls -->
+    <div class="top-bar">
+      <div class="status-badge">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span id="phase-greeting">Quiet Early Hours</span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn is-active" id="sound-toggle" title="Toggle Chime Sound" aria-label="Toggle Sound">
+          <svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path id="sound-wave" d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
+        <button class="icon-btn" id="settings-toggle" title="Desk Settings & Reset" aria-label="Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings Drawer -->
+    <div class="settings-drawer" id="settings-drawer">
+      <div class="settings-grid">
+        <div>
+          <label class="tiny-label" for="cfg-deadline-date">Thesis Milestone Date (optional)</label>
+          <input class="txt-input" type="date" id="cfg-deadline-date" />
+        </div>
+        <div>
+          <label class="tiny-label" for="cfg-word-goal">Daily Word Target</label>
+          <input class="txt-input" type="number" id="cfg-word-goal" min="100" step="50" value="500" />
+        </div>
+        <button class="ghost-btn" id="btn-reset-all" type="button">Reset Stats</button>
+      </div>
+    </div>
+
+    <!-- 4 Segmented Tabs -->
+    <div class="tab-track" role="tablist">
+      <div class="tab-glider" id="tab-glider"></div>
+      <button class="tab-btn is-active" data-tab="today" data-idx="0" role="tab">Today</button>
+      <button class="tab-btn" data-tab="focus" data-idx="1" role="tab">Focus</button>
+      <button class="tab-btn" data-tab="cite" data-idx="2" role="tab">Cite</button>
+      <button class="tab-btn" data-tab="phrase" data-idx="3" role="tab">Phrase</button>
+    </div>
+
+    <!-- TAB 1: TODAY -->
+    <section class="tab-panel is-active" id="panel-today">
+      <div class="hero-clock-row">
+        <div class="clock-left">
+          <div class="clock-digits">
+            <span id="clk-hh">00</span><span class="clock-colon">:</span><span id="clk-mm">00</span>
+          </div>
+          <div class="clock-meta">
+            <span class="tz-chip" id="local-tz-label">WIB</span>
+            <span class="sec-digits" id="clk-ss">:00</span>
+          </div>
+        </div>
+        <div class="date-right">
+          <div class="day-serif" id="day-name">Thursday</div>
+          <div class="date-sub" id="date-str">26 Nov 2026</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <span>IF YOU LOCK IN RIGHT NOW</span>
+        <span>TAP TO LAUNCH</span>
+      </div>
+      <div class="lockin-grid">
+        <button class="lockin-card" data-launch="25" data-label="25m Sprint" type="button">
+          <div class="lockin-title">25m Sprint</div>
+          <div class="lockin-end"><span class="lockin-arrow">→</span><span id="end-25">--:--</span></div>
+        </button>
+        <button class="lockin-card" data-launch="50" data-label="50m Deep" type="button">
+          <div class="lockin-title">50m Deep</div>
+          <div class="lockin-end"><span class="lockin-arrow">→</span><span id="end-50">--:--</span></div>
+        </button>
+        <button class="lockin-card" data-launch="90" data-label="90m Flow" type="button">
+          <div class="lockin-title">90m Flow</div>
+          <div class="lockin-end"><span class="lockin-arrow">→</span><span id="end-90">--:--</span></div>
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="progress-stack">
+        <div class="prog-row">
+          <div class="prog-labels">
+            <span class="prog-name">Today (24h)</span>
+            <span class="prog-right">
+              <span class="prog-detail" id="day-left">--</span>
+              <span class="prog-pct" id="day-pct">0.0%</span>
+            </span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="day-bar"></div></div>
+        </div>
+
+        <div class="prog-row">
+          <div class="prog-labels">
+            <span class="prog-name">Week Progress</span>
+            <span class="prog-right">
+              <span class="prog-detail" id="week-detail">--</span>
+              <span class="prog-pct" id="week-pct">0.0%</span>
+            </span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="week-bar"></div></div>
+        </div>
+
+        <div class="prog-row">
+          <div class="prog-labels">
+            <span class="prog-name" id="third-bar-title">Year Progress</span>
+            <span class="prog-right">
+              <span class="prog-detail" id="third-detail">--</span>
+              <span class="prog-pct" id="third-pct">0.0%</span>
+            </span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="third-bar"></div></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="world-head">
+        <span class="section-head" style="margin:0;">WORLD / DEADLINE</span>
+        <div class="zone-pills">
+          <button class="zone-btn is-active" data-zone="UTC" data-tz="UTC" type="button">UTC</button>
+          <button class="zone-btn" data-zone="SGT" data-tz="Asia/Singapore" type="button">SGT</button>
+          <button class="zone-btn" data-zone="US-ET" data-tz="America/New_York" type="button">US-ET</button>
+          <button class="zone-btn" data-zone="US-PT" data-tz="America/Los_Angeles" type="button">US-PT</button>
+          <button class="zone-btn" data-zone="UK" data-tz="Europe/London" type="button">UK</button>
+        </div>
+      </div>
+      <div class="world-bar">
+        <div class="world-now"><span id="world-zone-name">UTC</span> <strong id="world-zone-clock">--:--</strong></div>
+        <div class="deadline-box">
+          <input class="deadline-input" type="time" id="deadline-time-in" value="23:59" aria-label="Target deadline time in selected timezone" />
+          <span class="deadline-converted" id="deadline-local-out">→ --:-- WIB</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: FOCUS -->
+    <section class="tab-panel" id="panel-focus">
+      <div class="focus-wrap">
+        <div class="ring-box">
+          <svg class="ring-svg" viewBox="0 0 160 160">
+            <defs>
+              <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#6d3ef0" />
+                <stop offset="55%" stop-color="#8758f6" />
+                <stop offset="100%" stop-color="#bfa6fc" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="80" cy="80" r="68" />
+            <circle class="ring-fg" id="focus-ring" cx="80" cy="80" r="68" />
+          </svg>
+          <div class="ring-center">
+            <div class="ring-time" id="focus-display">25:00</div>
+            <div class="ring-mode" id="focus-tag-label">Bedah Jurnal</div>
+          </div>
+        </div>
+
+        <div class="focus-controls">
+          <div>
+            <div class="section-head"><span>RESEARCH MODE</span></div>
+            <div class="chip-row" id="task-chips">
+              <button class="mini-chip is-active" data-task="Bedah Jurnal" type="button">Bedah Jurnal</button>
+              <button class="mini-chip" data-task="Drafting Bab" type="button">Drafting Bab</button>
+              <button class="mini-chip" data-task="Olah Data" type="button">Olah Data</button>
+              <button class="mini-chip" data-task="Revisi" type="button">Revisi</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-head"><span>DURATION</span></div>
+            <div class="chip-row" id="preset-chips">
+              <button class="mini-chip is-active" data-min="25" type="button">25m</button>
+              <button class="mini-chip" data-min="50" type="button">50m</button>
+              <button class="mini-chip" data-min="90" type="button">90m</button>
+              <button class="mini-chip" data-min="5" type="button">5m Break</button>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="primary-btn" id="focus-toggle-btn" type="button">Start Focus</button>
+            <button class="ghost-btn" id="focus-reset-btn" type="button">Reset</button>
+            <button class="ghost-btn" id="add-words-btn" type="button">+100 Words</button>
+            <button class="ghost-btn" id="add-paper-btn" type="button">+1 Paper</button>
+          </div>
+
+          <div class="stats-strip">
+            <div>
+              <div class="stat-val" id="stat-sessions">0</div>
+              <div class="stat-lbl">Sessions</div>
+            </div>
+            <div>
+              <div class="stat-val" id="stat-words">0 / 500</div>
+              <div class="stat-lbl">Words Today</div>
+            </div>
+            <div>
+              <div class="stat-val" id="stat-papers">0</div>
+              <div class="stat-lbl">Papers Read</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CITE (DOI -> APA 7th & CiteKey) -->
+    <section class="tab-panel" id="panel-cite">
+      <div class="section-head">
+        <span>DOI → APA 7TH &amp; CITEKEY FETCHER</span>
+        <span>CROSSREF LIVE</span>
+      </div>
+      <div class="input-row">
+        <input class="txt-input" id="doi-input" placeholder="Paste DOI (e.g. 10.5089/9781451867480.001)" />
+        <button class="primary-btn" id="fetch-doi-btn" type="button">Fetch</button>
+      </div>
+
+      <div class="field-grid">
+        <input class="txt-input" id="cite-authors" placeholder="Authors (Gupta, A. S.)" />
+        <input class="txt-input" id="cite-year" placeholder="Year (2007)" />
+        <input class="txt-input" id="cite-journal" placeholder="Journal / Vol(Issue), pp" />
+      </div>
+      <div class="input-row">
+        <input class="txt-input" id="cite-title" placeholder="Article / Working Paper Title" />
+      </div>
+
+      <div class="output-card">
+        <div class="output-head">
+          <span class="output-label">In-Text &amp; CiteKey</span>
+          <div style="display:flex;gap:6px;">
+            <button class="copy-mini" id="copy-intext" type="button">Copy In-Text</button>
+            <button class="copy-mini" id="copy-citekey" type="button">Copy Key</button>
+          </div>
+        </div>
+        <div class="output-body" id="out-intext">Isi DOI lalu klik Fetch atau ketik manual untuk melihat sitasi APA 7th.</div>
+      </div>
+
+      <div class="output-card" style="margin-bottom:0;">
+        <div class="output-head">
+          <span class="output-label">Quick Citation (APA 7th Reference)</span>
+          <button class="copy-mini" id="copy-apa" type="button">Copy APA 7th</button>
+        </div>
+        <div class="output-body" id="out-apa">—</div>
+      </div>
+    </section>
+
+    <!-- TAB 4: PHRASE (Academic Synthesis Phrasebank) -->
+    <section class="tab-panel" id="panel-phrase">
+      <div class="world-head">
+        <span class="section-head" style="margin:0;">SYNTHESIS PHRASEBANK</span>
+        <div class="zone-pills">
+          <button class="zone-btn is-active" data-role="Gap" type="button">Gap</button>
+          <button class="zone-btn" data-role="Supporting" type="button">Supporting</button>
+          <button class="zone-btn" data-role="Contradicting" type="button">Contradicting</button>
+          <button class="zone-btn" data-role="Methodology" type="button">Method</button>
+          <button class="zone-btn" id="lang-toggle" type="button" style="border-color:var(--border-strong);color:var(--purple-deep);">ID</button>
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <input class="txt-input" id="ph-author" value="Gupta" placeholder="Author (e.g. Gupta)" />
+        <input class="txt-input" id="ph-year" value="2007" placeholder="Year" />
+        <input class="txt-input" id="ph-finding" value="kualitas tata kelola meningkatkan kinerja fiskal" placeholder="Temuan / Fokus" />
+      </div>
+
+      <div class="phrase-list" id="phrase-list"></div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard</div>
+
+  <script>
+    (() => {
+      const LS_KEY = "researcher_desk_v1";
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const state = (() => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+          if (saved.date !== todayKey) {
+            return {
+              date: todayKey,
+              sessions: 0,
+              words: 0,
+              papers: 0,
+              wordGoal: saved.wordGoal || 500,
+              deadlineDate: saved.deadlineDate || "",
+              sound: saved.sound !== false,
+            };
+          }
+          return {
+            date: todayKey,
+            sessions: saved.sessions || 0,
+            words: saved.words || 0,
+            papers: saved.papers || 0,
+            wordGoal: saved.wordGoal || 500,
+            deadlineDate: saved.deadlineDate || "",
+            sound: saved.sound !== false,
+          };
+        } catch {
+          return { date: todayKey, sessions: 0, words: 0, papers: 0, wordGoal: 500, deadlineDate: "", sound: true };
+        }
+      })();
+
+      function saveState() {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {}
+      }
+
+      // Soft Web Audio API chime
+      function playChime(type = "tap") {
+        if (!state.sound) return;
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return;
+          const ctx = new Ctx();
+          const now = ctx.currentTime;
+          const notes = type === "done" ? [523.25, 659.25, 783.99, 1046.5] : [660];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq;
+            const start = now + idx * 0.11;
+            const dur = type === "done" ? 0.55 : 0.08;
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(type === "done" ? 0.08 : 0.035, start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(start);
+            osc.stop(start + dur + 0.02);
+          });
+        } catch {}
+      }
+
+      const toastEl = document.getElementById("toast");
+      let toastTimer;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("is-shown");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove("is-shown"), 1800);
+      }
+
+      // Tab Switching
+      const glider = document.getElementById("tab-glider");
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const panels = document.querySelectorAll(".tab-panel");
+
+      function switchTab(tabName) {
+        tabBtns.forEach((b) => {
+          const active = b.dataset.tab === tabName;
+          b.classList.toggle("is-active", active);
+          if (active) {
+            glider.style.transform = `translateX(${Number(b.dataset.idx) * 100}%)`;
+          }
+        });
+        panels.forEach((p) => p.classList.toggle("is-active", p.id === `panel-${tabName}`));
+      }
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          playChime("tap");
+          switchTab(btn.dataset.tab);
+        });
+      });
+
+      // Sound & Settings controls
+      const soundBtn = document.getElementById("sound-toggle");
+      const soundWave = document.getElementById("sound-wave");
+      function renderSound() {
+        soundBtn.classList.toggle("is-active", state.sound);
+        soundWave.style.opacity = state.sound ? "1" : "0.2";
+      }
+      renderSound();
+      soundBtn.addEventListener("click", () => {
+        state.sound = !state.sound;
+        saveState();
+        renderSound();
+        if (state.sound) playChime("tap");
+        showToast(state.sound ? "Sound chime on" : "Sound muted");
+      });
+
+      const settingsDrawer = document.getElementById("settings-drawer");
+      const settingsBtn = document.getElementById("settings-toggle");
+      const cfgDeadline = document.getElementById("cfg-deadline-date");
+      const cfgWordGoal = document.getElementById("cfg-word-goal");
+      cfgDeadline.value = state.deadlineDate;
+      cfgWordGoal.value = state.wordGoal;
+
+      settingsBtn.addEventListener("click", () => {
+        settingsDrawer.classList.toggle("is-open");
+        settingsBtn.classList.toggle("is-active");
+      });
+      cfgDeadline.addEventListener("change", () => {
+        state.deadlineDate = cfgDeadline.value;
+        saveState();
+        updateClock();
+      });
+      cfgWordGoal.addEventListener("change", () => {
+        state.wordGoal = Math.max(50, Number(cfgWordGoal.value) || 500);
+        saveState();
+        renderStats();
+      });
+      document.getElementById("btn-reset-all").addEventListener("click", () => {
+        state.sessions = 0;
+        state.words = 0;
+        state.papers = 0;
+        saveState();
+        renderStats();
+        showToast("Today's focus stats reset");
+      });
+
+      // Clock, Lock-in & World/Deadline Logic
+      let selectedZoneTz = "UTC";
+      let selectedZoneName = "UTC";
+      const pad = (n) => String(n).padStart(2, "0");
+
+      function getPhaseLabel(h) {
+        if (h < 5) return "Quiet Early Hours";
+        if (h < 11) return "Morning Research";
+        if (h < 15) return "Deep Afternoon";
+        if (h < 19) return "Evening Drafting";
+        return "Night Focus Sprint";
+      }
+
+      function getTzShort() {
+        const offMin = -new Date().getTimezoneOffset();
+        if (offMin === 420) return "WIB";
+        if (offMin === 480) return "WITA";
+        if (offMin === 540) return "WIT";
+        return "LOC";
+      }
+
+      function formatInTz(date, timeZone) {
+        return new Intl.DateTimeFormat("en-GB", {
+          timeZone,
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }).format(date);
+      }
+
+      function getOffsetMinutesForTz(date, timeZone) {
+        const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
+        const tzDate = new Date(date.toLocaleString("en-US", { timeZone }));
+        return Math.round((tzDate - utcDate) / 60000);
+      }
+
+      function updateDeadlineConversion() {
+        const val = document.getElementById("deadline-time-in").value || "23:59";
+        const [hh, mm] = val.split(":").map(Number);
+        const now = new Date();
+        const remoteOff = getOffsetMinutesForTz(now, selectedZoneTz);
+        const localOff = -now.getTimezoneOffset();
+        let totalLocalMin = hh * 60 + mm + (localOff - remoteOff);
+        totalLocalMin = ((totalLocalMin % 1440) + 1440) % 1440;
+        const outHh = Math.floor(totalLocalMin / 60);
+        const outMm = totalLocalMin % 60;
+        document.getElementById("deadline-local-out").textContent = `→ ${pad(outHh)}:${pad(outMm)} ${getTzShort()}`;
+      }
+
+      function updateClock() {
+        const now = new Date();
+        const hh = now.getHours();
+        const mm = now.getMinutes();
+        const ss = now.getSeconds();
+
+        document.getElementById("clk-hh").textContent = pad(hh);
+        document.getElementById("clk-mm").textContent = pad(mm);
+        document.getElementById("clk-ss").textContent = `:${pad(ss)}`;
+        document.getElementById("local-tz-label").textContent = getTzShort();
+        document.getElementById("phase-greeting").textContent = getPhaseLabel(hh);
+
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        document.getElementById("day-name").textContent = days[now.getDay()];
+        document.getElementById("date-str").textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+        [25, 50, 90].forEach((m) => {
+          const end = new Date(now.getTime() + m * 60000);
+          document.getElementById(`end-${m}`).textContent = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+        });
+
+        // Today progress
+        const secToday = hh * 3600 + mm * 60 + ss;
+        const dayPct = (secToday / 86400) * 100;
+        const remMin = Math.max(0, 1440 - Math.floor(secToday / 60));
+        document.getElementById("day-left").textContent = `${Math.floor(remMin / 60)}h ${remMin % 60}m left`;
+        document.getElementById("day-pct").textContent = `${dayPct.toFixed(1)}%`;
+        document.getElementById("day-bar").style.width = `${dayPct.toFixed(1)}%`;
+
+        // Week progress (Mon=1 .. Sun=7)
+        const dowMon = (now.getDay() + 6) % 7;
+        const weekPct = (((dowMon * 86400) + secToday) / (7 * 86400)) * 100;
+        const jan1 = new Date(now.getFullYear(), 0, 1);
+        const dayOfYear = Math.floor((now - jan1) / 86400000) + 1;
+        const weekNum = Math.ceil((dayOfYear + jan1.getDay()) / 7);
+        document.getElementById("week-detail").textContent = `W${weekNum} • ${dowMon + 1}/7`;
+        document.getElementById("week-pct").textContent = `${weekPct.toFixed(1)}%`;
+        document.getElementById("week-bar").style.width = `${weekPct.toFixed(1)}%`;
+
+        // Third bar: Thesis Deadline if configured, else Year Progress
+        if (state.deadlineDate) {
+          const target = new Date(`${state.deadlineDate}T23:59:59`);
+          const diffDays = Math.ceil((target - now) / 86400000);
+          document.getElementById("third-bar-title").textContent = "Thesis Milestone Countdown";
+          if (diffDays >= 0) {
+            const pct = Math.min(100, Math.max(5, 100 - (diffDays / 90) * 100));
+            document.getElementById("third-detail").textContent = `${diffDays}d left (${state.deadlineDate})`;
+            document.getElementById("third-pct").textContent = `${pct.toFixed(0)}%`;
+            document.getElementById("third-bar").style.width = `${pct.toFixed(1)}%`;
+          } else {
+            document.getElementById("third-detail").textContent = "Milestone reached";
+            document.getElementById("third-pct").textContent = "100%";
+            document.getElementById("third-bar").style.width = "100%";
+          }
+        } else {
+          const isLeap = (y) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+          const totalDays = isLeap(now.getFullYear()) ? 366 : 365;
+          const yrPct = ((dayOfYear - 1 + secToday / 86400) / totalDays) * 100;
+          document.getElementById("third-bar-title").textContent = "Year Progress";
+          document.getElementById("third-detail").textContent = `Day ${dayOfYear}/${totalDays}`;
+          document.getElementById("third-pct").textContent = `${yrPct.toFixed(1)}%`;
+          document.getElementById("third-bar").style.width = `${yrPct.toFixed(1)}%`;
+        }
+
+        // World zone clock
+        document.getElementById("world-zone-name").textContent = selectedZoneName;
+        document.getElementById("world-zone-clock").textContent = formatInTz(now, selectedZoneTz);
+        updateDeadlineConversion();
+      }
+
+      document.querySelectorAll(".zone-btn[data-tz]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".zone-btn[data-tz]").forEach((b) => b.classList.remove("is-active"));
+          btn.classList.add("is-active");
+          selectedZoneTz = btn.dataset.tz;
+          selectedZoneName = btn.dataset.zone;
+          playChime("tap");
+          updateClock();
+        });
+      });
+      document.getElementById("deadline-time-in").addEventListener("input", updateDeadlineConversion);
+
+      // Focus Timer Logic
+      const CIRC = 2 * Math.PI * 68;
+      const ringEl = document.getElementById("focus-ring");
+      const displayEl = document.getElementById("focus-display");
+      const toggleBtn = document.getElementById("focus-toggle-btn");
+      let totalSec = 25 * 60;
+      let remSec = totalSec;
+      let timerId = null;
+
+      function renderStats() {
+        document.getElementById("stat-sessions").textContent = state.sessions;
+        document.getElementById("stat-words").textContent = `${state.words} / ${state.wordGoal}`;
+        document.getElementById("stat-papers").textContent = state.papers;
+      }
+      renderStats();
+
+      function renderTimer() {
+        const m = Math.floor(remSec / 60);
+        const s = remSec % 60;
+        displayEl.textContent = `${pad(m)}:${pad(s)}`;
+        const frac = totalSec > 0 ? remSec / totalSec : 1;
+        ringEl.style.strokeDashoffset = String(CIRC * (1 - frac));
+      }
+
+      function stopTimer() {
+        clearInterval(timerId);
+        timerId = null;
+        toggleBtn.textContent = "Start Focus";
+      }
+
+      function startTimer() {
+        if (timerId) return;
+        toggleBtn.textContent = "Pause Focus";
+        timerId = setInterval(() => {
+          remSec = Math.max(0, remSec - 1);
+          renderTimer();
+          if (remSec === 0) {
+            stopTimer();
+            state.sessions += 1;
+            saveState();
+            renderStats();
+            playChime("done");
+            showToast("Focus block complete!");
+          }
+        }, 1000);
+      }
+
+      function setPreset(minutes) {
+        stopTimer();
+        totalSec = minutes * 60;
+        remSec = totalSec;
+        document.querySelectorAll("#preset-chips .mini-chip").forEach((c) => {
+          c.classList.toggle("is-active", Number(c.dataset.min) === minutes);
+        });
+        renderTimer();
+      }
+
+      document.querySelectorAll(".lockin-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const mins = Number(card.dataset.launch);
+          setPreset(mins);
+          switchTab("focus");
+          startTimer();
+          playChime("tap");
+          showToast(`${card.dataset.label} launched`);
+        });
+      });
+
+      document.querySelectorAll("#task-chips .mini-chip").forEach((c) => {
+        c.addEventListener("click", () => {
+          document.querySelectorAll("#task-chips .mini-chip").forEach((x) => x.classList.remove("is-active"));
+          c.classList.add("is-active");
+          document.getElementById("focus-tag-label").textContent = c.dataset.task;
+          playChime("tap");
+        });
+      });
+
+      document.querySelectorAll("#preset-chips .mini-chip").forEach((c) => {
+        c.addEventListener("click", () => {
+          setPreset(Number(c.dataset.min));
+          playChime("tap");
+        });
+      });
+
+      toggleBtn.addEventListener("click", () => {
+        playChime("tap");
+        if (timerId) stopTimer();
+        else startTimer();
+      });
+
+      document.getElementById("focus-reset-btn").addEventListener("click", () => {
+        stopTimer();
+        remSec = totalSec;
+        renderTimer();
+        playChime("tap");
+      });
+
+      document.getElementById("add-words-btn").addEventListener("click", () => {
+        state.words += 100;
+        saveState();
+        renderStats();
+        playChime("tap");
+        showToast("+100 words logged");
+      });
+
+      document.getElementById("add-paper-btn").addEventListener("click", () => {
+        state.papers += 1;
+        saveState();
+        renderStats();
+        playChime("tap");
+        showToast("+1 paper logged");
+      });
+
+      // TAB 3: CITE (DOI -> APA 7th + CiteKey)
+      const doiEl = document.getElementById("doi-input");
+      const authorsEl = document.getElementById("cite-authors");
+      const yearEl = document.getElementById("cite-year");
+      const journalEl = document.getElementById("cite-journal");
+      const titleEl = document.getElementById("cite-title");
+      let currentCiteKey = "author2024";
+      let currentInText = "(Author, 2024)";
+      let currentApa = "";
+
+      function renderCitation() {
+        const a = authorsEl.value.trim();
+        const y = yearEl.value.trim();
+        const t = titleEl.value.trim();
+        const j = journalEl.value.trim();
+        const doi = doiEl.value.trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "");
+        if (!a && !t) {
+          document.getElementById("out-intext").textContent = "Isi DOI lalu klik Fetch atau ketik manual untuk melihat sitasi APA 7th.";
+          document.getElementById("out-apa").textContent = "—";
+          return;
+        }
+        const firstSurname = (a.split(",")[0] || a.split(" ")[0] || "author").replace(/[^a-zA-Z0-9]/g, "");
+        currentCiteKey = `${firstSurname.toLowerCase()}${y || "nd"}`;
+        const isMulti = a.includes("&") || a.includes("dkk") || a.includes("et al") || (a.match(/,/g) || []).length > 2;
+        const shortAuthor = isMulti ? `${firstSurname} dkk.` : firstSurname;
+        currentInText = `(${shortAuthor}, ${y || "n.d."})  •  CiteKey: ${currentCiteKey}`;
+        const tClean = t ? (/[.!?]$/.test(t) ? t : `${t}.`) : "";
+        const jClean = j ? ` ${j}.` : "";
+        const dClean = doi ? ` https://doi.org/${doi}` : "";
+        currentApa = `${a}${y ? ` (${y}).` : "."} ${tClean}${jClean}${dClean}`.replace(/\s+/g, " ").trim();
+        document.getElementById("out-intext").textContent = currentInText;
+        document.getElementById("out-apa").textContent = currentApa;
+      }
+
+      [doiEl, authorsEl, yearEl, journalEl, titleEl].forEach((el) => el.addEventListener("input", renderCitation));
+
+      document.getElementById("fetch-doi-btn").addEventListener("click", async () => {
+        const cleanDoi = doiEl.value.trim().replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "");
+        if (!cleanDoi) {
+          showToast("Masukkan DOI terlebih dahulu");
+          return;
+        }
+        const btn = document.getElementById("fetch-doi-btn");
+        btn.textContent = "Fetching...";
+        try {
+          const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
+          if (!res.ok) throw new Error("DOI not found");
+          const json = await res.json();
+          const m = json.message || {};
+          const auths = (m.author || []).map((au) => {
+            const fam = au.family || "";
+            const ini = (au.given || "").split(/\s+/).filter(Boolean).map((p) => `${p[0].toUpperCase()}.`).join(" ");
+            return fam ? (ini ? `${fam}, ${ini}` : fam) : au.name || "";
+          }).filter(Boolean);
+          authorsEl.value = auths.length > 1 ? `${auths.slice(0, -1).join(", ")}, & ${auths[auths.length - 1]}` : (auths[0] || "");
+          const yr = (m["published-print"]?.["date-parts"]?.[0]?.[0]) || (m["published-online"]?.["date-parts"]?.[0]?.[0]) || (m.created?.["date-parts"]?.[0]?.[0]) || "";
+          yearEl.value = yr;
+          titleEl.value = (m.title?.[0] || "").replace(/<[^>]+>/g, "");
+          const jTitle = m["container-title"]?.[0] || m.publisher || "";
+          const vol = m.volume ? `, ${m.volume}` : "";
+          const iss = m.issue ? `(${m.issue})` : "";
+          const pg = m.page ? `, ${m.page}` : "";
+          journalEl.value = `${jTitle}${vol}${iss}${pg}`.trim();
+          renderCitation();
+          playChime("done");
+          showToast("Metadata DOI berhasil diambil");
+        } catch {
+          showToast("DOI tidak ditemukan / offline");
+        } finally {
+          btn.textContent = "Fetch";
+        }
+      });
+
+      function copyText(text, label) {
+        if (!text || text === "—") return;
+        navigator.clipboard?.writeText(text).then(() => {
+          playChime("tap");
+          showToast(`${label} copied`);
+        }).catch(() => showToast("Copy failed"));
+      }
+
+      document.getElementById("copy-intext").addEventListener("click", () => copyText(currentInText.split("  •  ")[0], "In-text citation"));
+      document.getElementById("copy-citekey").addEventListener("click", () => copyText(currentCiteKey, "CiteKey"));
+      document.getElementById("copy-apa").addEventListener("click", () => copyText(currentApa, "APA 7th reference"));
+
+      // TAB 4: PHRASEBANK
+      let phRole = "Gap";
+      let phLang = "ID";
+      const PHRASES = {
+        ID: {
+          Gap: [
+            "Meskipun {A} ({Y}) menyoroti bahwa {F}, kajian empiris pada konteks regulasi domestik terkini masih terbatas.",
+            "Temuan {A} ({Y}) terkait {F} belum menguji variasi instrumen insentif secara komparatif, sehingga menyisakan ruang pengujian lanjutan.",
+            "Sebagian besar studi terdahulu ({A}, {Y}) masih berfokus pada {F} di pasar negara maju, bukan pada struktur pasar berkembang."
+          ],
+          Supporting: [
+            "Hasil penelitian ini sejalan dengan temuan {A} ({Y}) yang menunjukkan bahwa {F}.",
+            "Bukti empiris pada bagian ini memperkuat argumen {A} ({Y}), khususnya dalam konteks {F}.",
+            "Konsisten dengan {A} ({Y}), observasi lapangan mengindikasikan pola serupa terkait {F}."
+          ],
+          Contradicting: [
+            "Berbeda dengan simpulan {A} ({Y}) mengenai {F}, temuan pada periode pengamatan ini justru mengarah pada hasil yang berlawanan.",
+            "Meskipun {A} ({Y}) melaporkan bahwa {F}, perbedaan cakupan sampel dan desain kebijakan memicu hasil yang tidak identik.",
+            "Temuan ini mengoreksi asumsi umum dalam {A} ({Y}) karena bukti empiris menunjukkan divergensi pada aspek {F}."
+          ],
+          Methodology: [
+            "Mengadaptasi kerangka analisis {A} ({Y}), penelitian ini mengevaluasi {F} dengan penyesuaian parameter lokal.",
+            "Prosedur estimasi mengikuti pendekatan {A} ({Y}) untuk menjaga konsistensi pengukuran atas {F}.",
+            "Berbeda dari model statis {A} ({Y}), spesifikasi dalam penelitian ini mengakomodasi dinamika {F} antarperiode."
+          ]
+        },
+        EN: {
+          Gap: [
+            "While {A} ({Y}) established that {F}, empirical evidence under recent fiscal regimes remains scarce.",
+            "Prior work by {A} ({Y}) on {F} relies on aggregate proxies, leaving policy-specific incidence largely unexplored.",
+            "Whereas {A} ({Y}) examined {F} in mature economies, transferability to emerging institutional settings requires testing."
+          ],
+          Supporting: [
+            "These results corroborate {A} ({Y}), confirming that {F}.",
+            "Consistent with the evidence reported by {A} ({Y}), the estimates indicate that {F}.",
+            "The observed pattern aligns closely with {A} ({Y}), particularly regarding {F}."
+          ],
+          Contradicting: [
+            "In contrast to {A} ({Y}), who found that {F}, the present estimates reveal a diverging response.",
+            "Although {A} ({Y}) documented that {F}, differences in policy timing and market structure alter the net effect.",
+            "These findings nuance {A} ({Y}) by showing that {F} does not hold uniformly across specifications."
+          ],
+          Methodology: [
+            "Following the empirical strategy of {A} ({Y}), this study models {F} using harmonized panel controls.",
+            "To maintain comparability with {A} ({Y}), {F} is operationalized through standardized baseline metrics.",
+            "Extending the framework of {A} ({Y}), the specification captures heterogeneous responses in {F}."
+          ]
+        }
+      };
+
+      function renderPhrases() {
+        const a = document.getElementById("ph-author").value.trim() || "Author";
+        const y = document.getElementById("ph-year").value.trim() || "2024";
+        const f = document.getElementById("ph-finding").value.trim() || "variabel utama";
+        const list = PHRASES[phLang][phRole] || [];
+        const container = document.getElementById("phrase-list");
+        container.innerHTML = "";
+        list.forEach((tpl, idx) => {
+          const text = tpl.replace(/\{A\}/g, a).replace(/\{Y\}/g, y).replace(/\{F\}/g, f);
+          const card = document.createElement("div");
+          card.className = "output-card";
+          card.style.marginBottom = "0";
+          card.innerHTML = `
+            <div class="output-head">
+              <span class="output-label">${phRole} • Option ${idx + 1}</span>
+              <button class="copy-mini" type="button">Copy</button>
+            </div>
+            <div class="output-body"></div>
+          `;
+          card.querySelector(".output-body").textContent = text;
+          card.querySelector(".copy-mini").addEventListener("click", () => copyText(text, "Sentence"));
+          container.appendChild(card);
+        });
+      }
+
+      document.querySelectorAll(".zone-btn[data-role]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".zone-btn[data-role]").forEach((b) => b.classList.remove("is-active"));
+          btn.classList.add("is-active");
+          phRole = btn.dataset.role;
+          playChime("tap");
+          renderPhrases();
+        });
+      });
+
+      document.getElementById("lang-toggle").addEventListener("click", (e) => {
+        phLang = phLang === "ID" ? "EN" : "ID";
+        e.currentTarget.textContent = phLang;
+        playChime("tap");
+        renderPhrases();
+      });
+
+      ["ph-author", "ph-year", "ph-finding"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", renderPhrases);
+      });
+
+      renderTimer();
+      renderPhrases();
+      updateClock();
+      setInterval(updateClock, 1000);
+    })();
+  </script>
+</body>
+</html>
