@@ -39,6 +39,15 @@ You **never need to memorize commands**. Open the AGY chat panel and send whiche
 * **If your advisor already approved a title:**
   > *"Hi, my thesis title is already approved: '[your title]'. Please check my setup and help me start gathering literature and building the blueprint."*
 
+* **If you already have a Thesis Blueprint / Outline:**
+  > *"Hi, I already have a thesis blueprint/outline in [file path or attached text]. Please review and align it, check what literature or voice samples are still needed, then continue writing Chapters I–III through the final thesis."*
+
+* **If you already passed Proposal (have Chapters I–III) and need Data Analysis + Chapters IV–V:**
+  > *"Hi, I already have my Proposal (Chapters I–III) and my dataset in `02. Data & Analysis/`. Please audit my Chapters I–III, run the analysis, write Chapters IV–V, and compile `Complete_Thesis.docx`."*
+
+* **If you already finished Chapters I–V and just need humanizing, compliance audits, or Word `.docx` formatting:**
+  > *"Hi, I already drafted Chapters I–V in `03. Drafts/`. Please polish the Indonesian prose, run compliance/anti-plagiarism checks, link citations, and export the final `.docx`."*
+
 ---
 
 ## Tips for Working Smoothly with AGY

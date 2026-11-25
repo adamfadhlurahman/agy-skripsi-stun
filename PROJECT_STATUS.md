@@ -3,7 +3,8 @@
 > This file is automatically updated by AGY after each phase or chapter so every new chat session picks up seamlessly from where you left off.
 
 ## 1. Student & Project Profile
-- **Project Status:** `[NOT STARTED — BEGIN AT PHASE 0]`
+- **Project Status:** `[NOT STARTED — PICK ENTRY STAGE (FROM MINUS / TITLE / BLUEPRINT / BAB I-III / FULL DRAFT)]`
+- **Chosen Starting Stage:** `[Not set — Phase 1A / Phase 1B / Phase 2 / Phase 4-5 (Existing Blueprint) / Phase 6 (Existing Proposal) / Phase 7 (Polish & DOCX)]`
 - **Full Name / NPM:** `[Not set]`
 - **Department / Study Program (PKN STAN):** `[Not set — e.g., D-IV Akuntansi Sektor Publik / MKN / MAP]`
 - **Thesis Archetype (`PER-9/PKN/2020` Art. 3.1.2.1):** `[Not selected — Quantitative / Qualitative / Descriptive Simulation / Descriptive Design]`

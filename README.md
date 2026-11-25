@@ -2,7 +2,7 @@
 
 An end-to-end automated research and thesis-writing system powered by **Antigravity (AGY)**, tailored for **STUN** students across all departments and study programs.
 
-Designed specifically for **complete beginners with zero prior knowledge of AI agents or coding**—even if you are **starting from scratch with no topic idea yet**—all the way through your **Thesis Proposal (Chapters I–III)** and **Complete Thesis (Chapters I–V + References + Appendices + CV)** exported as a submission-ready `.docx` following the **latest official STUN formatting and anti-plagiarism regulations**.
+Designed specifically for **complete beginners with zero prior knowledge of AI agents or coding**—whether you are **starting from scratch ("from minus")**, **bringing an advisor-approved title**, **uploading an existing Blueprint / Outline**, or **continuing from Proposal Chapters I–III**—all the way through your **Thesis Proposal (Chapters I–III)** and **Complete Thesis (Chapters I–V + References + Appendices + CV)** exported as a submission-ready `.docx` following the **latest official STUN formatting and anti-plagiarism regulations**.
 
 ---
 
@@ -37,19 +37,21 @@ Designed specifically for **complete beginners with zero prior knowledge of AI a
 
 ---
 
-## Complete Workflow (From Minus to Defense-Ready)
+## Complete Workflow (Start From Any Stage -> Defense-Ready)
 
-| Phase | What Happens |
-|---|---|
-| **Phase 0** | Automatic Python/Zotero readiness check & student/program profile setup (`thesis_config.json`). |
-| **Phase 1A ("From Minus")** | If you have no idea yet, AGY explores your favorite courses, past project experience, data comfort level, and matches them against accessible open datasets. |
-| **Phase 1B (Gap Testing)** | Tests your top 1–2 candidate titles across 3 gates (open gap, clear contribution, data feasibility) and locks 1 Title + Thesis Archetype (*Quantitative / Qualitative / Descriptive Simulation / Descriptive Design*). |
-| **Phase 2 (Literature & Zotero)** | Collects peer-reviewed papers and official regulations into `01. Literature/`, builds a Literature Triage Matrix, and links Zotero. |
-| **Phase 3 (Voice Calibration)** | Analyzes 1–2 of your own past writing samples (`05. Voice Reference/`) so your thesis sounds genuinely like you, not generic AI prose. |
-| **Phase 4 (Research Blueprint)** | Locks Research Questions, Operational Definitions, Data Map, and Subchapter Outline in `03. Drafts/Thesis Blueprint.md`. |
-| **Phase 5 (Proposal Chapters I–III)** | Drafts Chapters I–III, runs formatting/anti-AI/n-gram overlap audits, performs peer-reviewer critique, and exports `04. Output DOCX/Proposal_Thesis.docx`. |
-| **Phase 6 (Analysis & Chapters IV–V)** | Analyzes data in `02. Data & Analysis/`, generates 300 DPI charts, drafts Chapters IV–V + Abstract (<= 250 words), and syncs Chapters I–III. |
-| **Phase 7 (Final Thesis `.docx`)** | Compiles the complete document (`Cover`, `Approval`, `Examination Pass`, `Originality Statement`, `Preface`, `TOC/Tables/Figures/Appendices`, `Abstract`, `Chapters I–V`, `References`, `Appendices`, `CV`) into `04. Output DOCX/Complete_Thesis.docx`. |
+Your AI agent detects what you already have (or asks in the first chat) and **automatically skips completed stages**, picking up cleanly from whichever milestone is untouched:
+
+| Phase | What Happens | Can Start Directly Here? |
+|---|---|---|
+| **Phase 0** | Automatic Python/Zotero readiness check, existing-file scan, & student/program profile (`thesis_config.json`). | Always runs in 1 minute |
+| **Phase 1A ("From Minus")** | If you have no idea yet, your agent explores your favorite courses, past project experience, and open datasets -> 3–5 topic options. | Yes (no idea yet) |
+| **Phase 1B (Gap Testing)** | Tests your top 1–2 candidate titles across 3 gates (open gap, contribution, feasibility) and locks 1 Title + Thesis Archetype. | Yes (rough idea) |
+| **Phase 2 (Literature & Zotero)** | Collects peer-reviewed papers and regulations into `01. Literature/`, builds a Literature Triage Matrix, and links Zotero. | Yes (approved title) |
+| **Phase 3 (Voice Calibration)** | Analyzes 1–2 of your own past writing samples (`05. Voice Reference/` or your existing chapters) so prose sounds like you. | Auto-runs before drafting |
+| **Phase 4 (Research Blueprint)** | Locks Research Questions, Operational Definitions, Data Map, and Subchapter Outline in `03. Drafts/Thesis Blueprint.md`. | Yes (existing outline/notes) |
+| **Phase 5 (Proposal Chapters I–III)** | Imports/aligns your existing Blueprint (if provided), drafts Chapters I–III, runs formatting/anti-AI/n-gram audits, and exports `Proposal_Thesis.docx`. | Yes (existing Blueprint) |
+| **Phase 6 (Analysis & Chapters IV–V)** | Imports/audits your existing Chapters I–III (if provided), analyzes data in `02. Data & Analysis/`, generates 300 DPI figures, and drafts Chapters IV–V + Abstract (<= 250 words). | Yes (existing Proposal / post-Sempro) |
+| **Phase 7 (Final Thesis `.docx`)** | Polishes language/citations and compiles the complete document (`Cover` through `CV`) into `04. Output DOCX/Complete_Thesis.docx`. | Yes (existing Chapters I–V) |
 
 ---
 

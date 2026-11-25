@@ -18,18 +18,24 @@ Your job is to guide the user seamlessly from wherever they are—from zero idea
    - At the start of every session or whenever the user asks for the next step, **read [`PROJECT_STATUS.md`](./PROJECT_STATUS.md)** and [`thesis_config.json`](./thesis_config.json) (if it exists).
    - Continue seamlessly from the last completed phase or section without asking the user to repeat context.
    - Immediately update [`PROJECT_STATUS.md`](./PROJECT_STATUS.md) after finishing any phase or chapter.
-3. **First-Greeting Protocol (When `PROJECT_STATUS.md` Is Still Blank):**
-   - When the user first says hello (e.g., *"Hi"*, *"Where do I start?"*, *"I have no thesis idea yet"*):
-     1. Quietly run the environment check:
+3. **First-Greeting & Adaptive Entry Protocol (When `PROJECT_STATUS.md` Is Still Blank):**
+   - When the user first says hello (e.g., *"Hi"*, *"Where do I start?"*, *"I have no thesis idea yet"*, or *"I already have a blueprint / Chapters I–III"*):
+     1. Quietly run the environment check and inspect existing workspace folders (`01. Literature/`, `02. Data & Analysis/`, `03. Drafts/`, `05. Voice Reference/`):
         ```powershell
         python scripts/setup_check.py
         ```
         *(If required Python packages are missing and the user agrees, run `powershell -ExecutionPolicy Bypass -File scripts/setup.ps1` on Windows or `bash scripts/setup.sh` on macOS/Linux, or `pip install -r requirements.txt`).*
-     2. Summarize readiness in plain terms (e.g., *"Your Word builder and language checker are ready; Zotero isn't open yet, which we can turn on later when collecting papers"*).
-     3. Ask **3 simple onboarding questions** to launch Phase 0 and Phase 1A:
+     2. Summarize readiness in plain terms (e.g., *"Your Word builder and language checker are ready; Zotero isn't open yet, which we can turn on later when collecting papers"*). If files already exist in `03. Drafts/`, `01. Literature/`, or `02. Data & Analysis/`, acknowledge them immediately.
+     3. Ask **3 simple onboarding questions** (or jump straight to the matching entry point if the user already stated their stage):
         - **Full Name, NPM (Student ID), Department / Study Program** at **PKN STAN** (e.g., D-IV Akuntansi Sektor Publik, D-IV Manajemen Keuangan Negara, D-IV Manajemen Aset Publik, or another program)?
-        - **Current starting point:** completely blank with no topic idea yet, a rough area of interest/internship (PKL), or an advisor-approved title?
-        - **Do you still have 1–2 past writing samples** (e.g., your Diploma III KTTA or a past course paper) so we can calibrate the writing style to sound authentically like you?
+        - **Current starting point (pick 1–6):**
+          1. *Starting from minus* (no topic idea yet) -> **Phase 1A–7**.
+          2. *Have a rough area / PKL or KTTA idea* -> **Brief Phase 1A -> Phase 1B–7**.
+          3. *Already have an advisor-approved title* -> **Phase 2–7**.
+          4. *Already have a Thesis Blueprint / Outline* (plus or minus literature) -> Import & align to `03. Drafts/Blueprint Skripsi.md` + `thesis_config.json`, check `voice-penulis-id.md`, then jump to **Phase 5–7**.
+          5. *Already have Proposal Chapters I–III (post-Sempro) & ready for data/Bab IV–V* -> Import/audit Chapters I–III, run **Phase 6–7** (analysis, Chapters IV–V, cross-chapter sync, complete `.docx`).
+          6. *Already have a full draft (Chapters I–V)* -> Humanize, audit `PER-9`/`PER-4`, attach Zotero citations & build final `.docx` (**Phase 7**).
+        - **Existing files or writing sample:** Ask the student to drop/share their existing blueprint, draft `.docx`/`.pdf`, dataset, or 1–2 past writing samples (`05. Voice Reference/`)—if they already have Chapters I–III, those can also calibrate `voice-penulis-id.md`!
 4. **Automatic Local Skill Orchestration:**
    - Follow the **Phase 0 to Phase 7** roadmap in [`.agents/skills/thesis-autopilot/SKILL.md`](./.agents/skills/thesis-autopilot/SKILL.md).
    - Activate bundled skills in `.agents/skills/` automatically by stage:

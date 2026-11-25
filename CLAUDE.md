@@ -4,7 +4,7 @@
 
 ## Claude Code Path & Skill Discovery Bridge
 
-Claude Code reads this file automatically at startup. Follow every rule in [`AGENTS.md`](./AGENTS.md) and always inspect [`PROJECT_STATUS.md`](./PROJECT_STATUS.md) plus [`thesis_config.json`](./thesis_config.json) (if present) before responding.
+Claude Code reads this file automatically at startup. Follow every rule in [`AGENTS.md`](./AGENTS.md) and always inspect [`PROJECT_STATUS.md`](./PROJECT_STATUS.md), [`thesis_config.json`](./thesis_config.json) (if present), and any user-provided files in `01. Literature/`, `02. Data & Analysis/`, or `03. Drafts/` before responding. Always offer adaptive entry points (starting from minus, rough idea, approved title, existing blueprint, existing Proposal Chapters I–III, or existing full draft) so buyers continue smoothly from their current stage through Phase 7.
 
 Because bundled skills live in `.agents/skills/` (shared across Antigravity, Codex CLI, Gemini CLI, Cursor, and Claude Code), **read the relevant `SKILL.md` files from `.agents/skills/<name>/SKILL.md`** directly using your file-reading tool according to the active phase:
 

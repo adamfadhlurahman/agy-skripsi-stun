@@ -21,13 +21,34 @@ This skill guides PKN STAN students—including complete beginners with zero AI 
    - Full Name & NPM (Student ID).
    - Department, Study Program, and Concentration at **PKN STAN** (`D-IV Akuntansi Sektor Publik`, `D-IV Manajemen Keuangan Negara`, `D-IV Manajemen Aset Publik`, or another program).
    - Academic Advisor & Program Chair names (if assigned; otherwise keep clean placeholders).
-   - **Starting Point:**
-     1. *Completely blank ("from minus")* -> Full **Phase 1A**.
-     2. *Have a rough topic/interest or PKL/KTTA idea* -> Brief **Phase 1A**, then **Phase 1B**.
-     3. *Already have an advisor-approved title* -> Populate `thesis_config.json`, pick the `PER-9/PKN/2020` archetype, and jump to **Phase 2**.
+   - **Starting Point (Never force users who already have progress to restart from zero):**
+     1. *Completely blank ("from minus")* -> Full **Phase 1A–7**.
+     2. *Have a rough topic/interest or PKL/KTTA idea* -> Brief **Phase 1A**, then **Phase 1B–7**.
+     3. *Already have an advisor-approved title* -> Populate `thesis_config.json`, pick the `PER-9/PKN/2020` archetype, and jump to **Phase 2–7**.
+     4. *Already have a Thesis Blueprint / Outline (or partial literature/notes)* -> Run the **Adaptive Existing-Work Intake** below, sync `Blueprint Skripsi.md` & `thesis_config.json`, verify `Phase 2` literature & `Phase 3` voice calibration, mark completed phases `[x]` in `PROJECT_STATUS.md`, and jump to **Phase 5–7**.
+     5. *Already have Proposal (`Bab I–III`, `.docx`/`.md`) / Post-Sempro* -> Run **Adaptive Existing-Work Intake**, import/audit Chapters I–III, mark Phases 0–5 `[x]` (completing any missing `zotero_map.json` / `voice-penulis-id.md` gaps), and execute **Phase 6–7** through final submission `.docx`.
+     6. *Already have a full draft (`Bab I–V`)* -> Run **Adaptive Existing-Work Intake**, run `audit_manuscript.py` + `humanizer-indonesia` + citation matching (`zotero_map.json`), and build the submission-ready `.docx` in **Phase 7**.
 3. **Phase 0 Output:**
    - Copy `thesis_config.example.json` to `thesis_config.json` and fill in student identity, program, and chapter labels.
-   - Update `PROJECT_STATUS.md` (check off Phase 0).
+   - Update `PROJECT_STATUS.md` (check off Phase 0 and any earlier stages skipped/imported).
+
+---
+
+## Adaptive Existing-Work Intake (When the Student Already Has a Blueprint, Proposal, or Draft)
+
+Whenever a student arrives with existing work (a blueprint, outline, literature folder, dataset, Proposal `Bab I–III`, or full draft `Bab I–V`), **never ask them to re-invent their topic or redo finished stages**. Follow this 4-step intake:
+
+1. **Inspect & Extract Without Overwriting:**
+   - Read whatever files the student provides or places in `01. Literature/`, `02. Data & Analysis/`, or `03. Drafts/` (if `.docx` or `.pdf`, extract text with `python-docx` / `pymupdf` / `scripts/extract_voice_sample.py`).
+   - Preserve the student's approved title, research questions (`RM1..RMk`), variables/criteria, methodology, and substantive arguments. Only propose adjustments if there is a factual contradiction or a `PER-9/PKN/2020` / `PER-4/PKN/2020` compliance issue.
+2. **Map to Workspace Contract:**
+   - **If starting from a Blueprint / Outline:** Convert or align it into `03. Drafts/Blueprint Skripsi.md` (confirming `PER-9/PKN/2020` archetype, research questions, operational definitions, data sources, and subchapter structure `1.1..5.x`), populate `thesis_config.json`, and check whether `01. Literature/` + `zotero_map.json` need to be populated before Phase 5.
+   - **If starting from Proposal (`Bab I–III`) or Full Draft (`Bab I–V`):** Reconstruct `Blueprint Skripsi.md` from their existing chapters (so Chapters IV–V stay 100% consistent), split/convert chapters into clean Markdown (`03. Drafts/Bab I ...md` etc.), and extract their citations into `zotero_map.json`.
+   - **Smart Voice Calibration Shortcut:** If the student did not supply a separate essay in `05. Voice Reference/`, extract prose from their own existing `Bab I–III` / proposal text using `scripts/extract_voice_sample.py` to build `voice-penulis-id.md`!
+3. **Confirm Fast Gap-Fill Plan with the Student:**
+   - Present a short checklist showing: **(a) Phases already covered by their files** (marked `[x]`), **(b) Any small missing prerequisites** (e.g., Zotero map, voice calibration, or dataset check), and **(c) Exact next phase AGY will execute through Phase 7**. Ask for confirmation before editing or drafting.
+4. **Execute Through Completion (Phase 7):**
+   - Run all remaining phases seamlessly—always finishing with `audit_manuscript.py`, `humanizer-indonesia`, `generate_citation_specs.py`, `build_thesis_docx.py`, `update_word_fields.py`, and `verify_thesis_docx.py` so the final `.docx` is genuinely complete and verified.
 
 ---
 
