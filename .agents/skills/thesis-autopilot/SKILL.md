@@ -28,6 +28,9 @@ This skill guides PKN STAN students—including complete beginners with zero AI 
      4. *Already have a Thesis Blueprint / Outline (or partial literature/notes)* -> Run the **Adaptive Existing-Work Intake** below, sync `Blueprint Skripsi.md` & `thesis_config.json`, verify `Phase 2` literature & `Phase 3` voice calibration, mark completed phases `[x]` in `PROJECT_STATUS.md`, and jump to **Phase 5–7**.
      5. *Already have Proposal (`Bab I–III`, `.docx`/`.md`) / Post-Sempro* -> Run **Adaptive Existing-Work Intake**, import/audit Chapters I–III, mark Phases 0–5 `[x]` (completing any missing `zotero_map.json` / `voice-penulis-id.md` gaps), and execute **Phase 6–7** through final submission `.docx`.
      6. *Already have a full draft (`Bab I–V`)* -> Run **Adaptive Existing-Work Intake**, run `audit_manuscript.py` + `humanizer-indonesia` + citation matching (`zotero_map.json`), and build the submission-ready `.docx` in **Phase 7**.
+   - **Optional Reference Manager & Knowledge Hub (Strictly Opt-In — never block if declined):**
+     - Ask if they use **Zotero Desktop**, **Mendeley**, or **None (built-in APA 7th)**.
+     - Offer once whether they want to connect **(a) the bundled Purple Notion Research Dashboard**, **(b) a local Obsidian Vault**, or **(c) Local workspace folder only (default — skip both)**. Only activate `notion-research-sync` if the student explicitly chooses (a) or (b).
 3. **Phase 0 Output:**
    - Copy `thesis_config.example.json` to `thesis_config.json` and fill in student identity, program, and chapter labels.
    - Update `PROJECT_STATUS.md` (check off Phase 0 and any earlier stages skipped/imported).

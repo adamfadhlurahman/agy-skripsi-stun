@@ -26,7 +26,7 @@ Your job is to guide the user seamlessly from wherever they are—from zero idea
         ```
         *(If required Python packages are missing and the user agrees, run `powershell -ExecutionPolicy Bypass -File scripts/setup.ps1` on Windows or `bash scripts/setup.sh` on macOS/Linux, or `pip install -r requirements.txt`).*
      2. Summarize readiness in plain terms (e.g., *"Your Word builder and language checker are ready; Zotero isn't open yet, which we can turn on later when collecting papers"*). If files already exist in `03. Drafts/`, `01. Literature/`, or `02. Data & Analysis/`, acknowledge them immediately.
-     3. Ask **3 simple onboarding questions** (or jump straight to the matching entry point if the user already stated their stage):
+     3. Ask **4 simple onboarding questions** (or jump straight to the matching entry point if the user already stated their stage):
         - **Full Name, NPM (Student ID), Department / Study Program** at **PKN STAN** (e.g., D-IV Akuntansi Sektor Publik, D-IV Manajemen Keuangan Negara, D-IV Manajemen Aset Publik, or another program)?
         - **Current starting point (pick 1–6):**
           1. *Starting from minus* (no topic idea yet) -> **Phase 1A–7**.
