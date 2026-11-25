@@ -41,6 +41,7 @@
     ]
   },
   "zotero": {
+    "provider": "zotero",
     "user_id": "0",
     "collection_key": "",
     "locale": "id-ID",

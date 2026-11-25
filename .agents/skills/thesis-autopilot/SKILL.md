@@ -92,12 +92,19 @@ Activate **`lit-review-assistant`**, **`literature-triage-matrix`**, and **`pape
 
 1. Gather recent peer-reviewed journals (5–10 years), official regulations (`JDIH Kemenkeu` / `peraturan.bpk.go.id`), and institutional reports into `01. Literature/` named cleanly (e.g., `Author (Year) - Short Title.pdf`).
    - When `paper-search` MCP is unavailable, run `python scripts/search_papers.py --query "<keywords>" --from-year 2016 --download-oa --export-zotero "03. Drafts/zotero_map.json"` (or `--doi "<doi>"`) to discover verified OpenAlex/CrossRef papers, automatically download legal Open Access PDFs into `01. Literature/`, and populate `03. Drafts/zotero_map.json`.
-2. Guide the student to turn on Zotero Desktop & Local API (if installed), create a thesis collection (e.g., `Skripsi`), add all references, and run:
-   ```powershell
-   python scripts/build_zotero_map.py --list-collections
-   python scripts/build_zotero_map.py --collection-name "Skripsi" --out "03. Drafts/zotero_map.json"
-   ```
-   *(If Zotero Desktop is closed or not installed, `scripts/search_papers.py --export-zotero` or `--csl-json` already populates `03. Drafts/zotero_map.json` cleanly, and `build_thesis_docx.py` formats a full APA 7th bibliography automatically).*
+2. **Hybrid Citation Manager Choice (Zotero OR Mendeley):**
+   - Ask whether the student uses **Zotero Desktop** or **Mendeley** (or none yet):
+     - **If Zotero:** Guide them to turn on Zotero Desktop & Local API, create a thesis collection (e.g., `Skripsi`), add all references, and run:
+       ```powershell
+       python scripts/build_zotero_map.py --list-collections
+       python scripts/build_zotero_map.py --collection-name "Skripsi" --out "03. Drafts/zotero_map.json"
+       ```
+     - **If Mendeley (Reference Manager / Desktop):** Export any papers found via `search_papers.py --export-ris "01. Literature/references_mendeley.ris"` for 1-click import into Mendeley, OR import the student's existing Mendeley `.bib`/`.ris` export directly into the thesis map:
+       ```powershell
+       python scripts/build_zotero_map.py --bib "01. Literature/library.bib" --provider mendeley --out "03. Drafts/zotero_map.json"
+       ```
+       *(Supports `--ris` too; `build_thesis_docx.py` automatically adapts to `provider: "mendeley"` with clean APA 7th in-text citations and `DAFTAR PUSTAKA`, without Zotero-only XML).*
+     - **If neither manager is installed:** `scripts/search_papers.py --export-zotero "03. Drafts/zotero_map.json"` populates verified CSL-JSON metadata directly, and `build_thesis_docx.py` formats a complete APA 7th bibliography automatically.
 3. Build **`.research/literature_matrix.md`** via `literature-triage-matrix` comparing author, year, method, data/sample, core findings, and limitations.
 4. *(Optional)* If `notebooklm-mcp` is active, upload key PDFs for cross-document fact verification.
 

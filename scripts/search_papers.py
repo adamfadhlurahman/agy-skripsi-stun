@@ -8,6 +8,7 @@ into `01. Literature/`, and exporting verified CSL-JSON entries into `03. Drafts
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import pathlib
 import re
@@ -116,9 +117,9 @@ def fetch_crossref_doi(doi: str) -> dict | None:
             yr = int(dp[0][0])
             break
 
-    title = (msg.get("title") or [""])[0]
-    journal = (msg.get("container-title") or [""])[0]
-    abstract = re.sub(r"<[^>]+>", " ", msg.get("abstract") or "")
+    title = html.unescape((msg.get("title") or [""])[0])
+    journal = html.unescape((msg.get("container-title") or [""])[0])
+    abstract = html.unescape(re.sub(r"<[^>]+>", " ", msg.get("abstract") or ""))
     abstract = re.sub(r"\s+", " ", abstract).strip()
 
     csl = {
@@ -249,8 +250,8 @@ def search_crossref(query: str, limit: int = 8, year_from: int | None = None) ->
         dp = msg.get("issued", {}).get("date-parts", [[]])
         if dp and dp[0] and dp[0][0]:
             yr = int(dp[0][0])
-        title = (msg.get("title") or [""])[0]
-        journal = (msg.get("container-title") or [""])[0]
+        title = html.unescape((msg.get("title") or [""])[0])
+        journal = html.unescape((msg.get("container-title") or [""])[0])
         csl = {
             "type": "article-journal" if journal else "article",
             "title": title,
@@ -346,6 +347,82 @@ def export_to_zotero_map(papers: list[dict], map_path: pathlib.Path, enrich_cros
     return added
 
 
+def export_to_ris(papers: list[dict], ris_path: pathlib.Path) -> int:
+    blocks = []
+    for p in papers:
+        csl = p.get("csl") or {}
+        lines = ["TY  - JOUR" if csl.get("type") == "article-journal" else "TY  - GEN"]
+        if csl.get("title"):
+            lines.append(f"TI  - {csl['title']}")
+        for a in csl.get("author", []):
+            fam = a.get("family") or a.get("literal") or ""
+            giv = a.get("given") or ""
+            lines.append(f"AU  - {fam}, {giv}".strip(", ") if giv else f"AU  - {fam}")
+        dp = csl.get("issued", {}).get("date-parts", [[]])
+        if dp and dp[0]:
+            lines.append(f"PY  - {dp[0][0]}")
+        if csl.get("container-title"):
+            lines.append(f"JO  - {csl['container-title']}")
+        if csl.get("volume"):
+            lines.append(f"VL  - {csl['volume']}")
+        if csl.get("issue"):
+            lines.append(f"IS  - {csl['issue']}")
+        if csl.get("page"):
+            pgs = str(csl["page"]).split("-")
+            lines.append(f"SP  - {pgs[0].strip()}")
+            if len(pgs) > 1 and pgs[1].strip():
+                lines.append(f"EP  - {pgs[1].strip()}")
+        if csl.get("DOI"):
+            lines.append(f"DO  - {csl['DOI']}")
+        if csl.get("URL"):
+            lines.append(f"UR  - {csl['URL']}")
+        lines.append("ER  - ")
+        blocks.append("\n".join(lines))
+    ris_path.parent.mkdir(parents=True, exist_ok=True)
+    ris_path.write_text("\n\n".join(blocks) + "\n", encoding="utf-8")
+    return len(blocks)
+
+
+def export_to_bibtex(papers: list[dict], bib_path: pathlib.Path) -> int:
+    used: set[str] = set()
+    entries = []
+    for p in papers:
+        csl = p.get("csl") or {}
+        key = _make_item_key(csl, used)
+        used.add(key)
+        auth_parts = []
+        for a in csl.get("author", []):
+            fam = a.get("family") or a.get("literal") or ""
+            giv = a.get("given") or ""
+            auth_parts.append(f"{fam}, {giv}" if giv else fam)
+        dp = csl.get("issued", {}).get("date-parts", [[]])
+        yr = str(dp[0][0]) if dp and dp[0] else ""
+        lines = [f"@article{{{key},"]
+        if auth_parts:
+            lines.append(f"  author = {{{' and '.join(auth_parts)}}},")
+        if csl.get("title"):
+            lines.append(f"  title = {{{{{csl['title']}}}}},")
+        if csl.get("container-title"):
+            lines.append(f"  journal = {{{csl['container-title']}}},")
+        if yr:
+            lines.append(f"  year = {{{yr}}},")
+        if csl.get("volume"):
+            lines.append(f"  volume = {{{csl['volume']}}},")
+        if csl.get("issue"):
+            lines.append(f"  number = {{{csl['issue']}}},")
+        if csl.get("page"):
+            lines.append(f"  pages = {{{str(csl['page']).replace('-', '--')}}},")
+        if csl.get("DOI"):
+            lines.append(f"  doi = {{{csl['DOI']}}},")
+        if csl.get("URL"):
+            lines.append(f"  url = {{{csl['URL']}}},")
+        lines.append("}")
+        entries.append("\n".join(lines))
+    bib_path.parent.mkdir(parents=True, exist_ok=True)
+    bib_path.write_text("\n\n".join(entries) + "\n", encoding="utf-8")
+    return len(entries)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Search real academic papers via OpenAlex & CrossRef (zero MCP needed).")
     parser.add_argument("query_pos", nargs="?", default="", help="Search keywords (e.g., 'tax revenue determinants ASEAN')")
@@ -358,6 +435,8 @@ def main() -> None:
     parser.add_argument("--source", choices=["auto", "openalex", "crossref"], default="auto", help="API source")
     parser.add_argument("--download", "--download-oa", dest="download", nargs="?", const="01. Literature", default=None, help="Download legal OA PDFs to folder")
     parser.add_argument("--export-zotero-map", "--export-zotero", dest="export_zotero_map", type=pathlib.Path, default=None, help="Merge CSL-JSON results into zotero_map.json")
+    parser.add_argument("--export-ris", type=pathlib.Path, default=None, help="Export results as .ris for 1-click Mendeley/Zotero import")
+    parser.add_argument("--export-bib", type=pathlib.Path, default=None, help="Export results as BibTeX .bib for Mendeley/LaTeX import")
     parser.add_argument("--json", action="store_true", help="Print full JSON results")
     args = parser.parse_args()
     args.query = (args.query_flag or args.query_pos or "").strip()
@@ -392,6 +471,8 @@ def main() -> None:
     added_zot = 0
     if args.export_zotero_map and papers:
         added_zot = export_to_zotero_map(papers, args.export_zotero_map)
+    added_ris = export_to_ris(papers, args.export_ris) if (args.export_ris and papers) else 0
+    added_bib = export_to_bibtex(papers, args.export_bib) if (args.export_bib and papers) else 0
 
     if args.json:
         print(json.dumps(papers, ensure_ascii=False, indent=2))
@@ -415,6 +496,10 @@ def main() -> None:
         print(f"\nDownloaded {len(downloaded)} Open-Access PDF(s) to {args.download}.")
     if args.export_zotero_map:
         print(f"Merged {added_zot} new reference(s) into {args.export_zotero_map}.")
+    if args.export_ris:
+        print(f"Exported {added_ris} reference(s) for Mendeley/Zotero import -> {args.export_ris}.")
+    if args.export_bib:
+        print(f"Exported {added_bib} reference(s) as BibTeX -> {args.export_bib}.")
 
 
 if __name__ == "__main__":

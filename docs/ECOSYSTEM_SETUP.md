@@ -30,12 +30,24 @@ python scripts/setup_check.py
 
 ---
 
-## 3. Zotero Desktop (Required for Live Word Citations)
+## 3. Hybrid Citation Manager Setup (Zotero OR Mendeley)
 
+This starter kit supports **both Zotero and Mendeley** (plus a zero-manager APA 7th fallback):
+
+### Option A — Zotero Desktop (Live Word Fields)
 1. Install **Zotero Desktop** and the **Zotero Word Plugin**.
 2. Open Zotero Desktop -> **Settings / Preferences -> Advanced -> General**.
 3. Check **"Allow other applications on this computer to communicate with Zotero"** (enables Local API on `http://127.0.0.1:23119`).
 4. Create one dedicated collection for your thesis (e.g., `Thesis`), then run `scripts/setup_check.py` to confirm connectivity.
+
+### Option B — Mendeley (Mendeley Reference Manager / Mendeley Desktop)
+1. Store your papers inside a collection in **Mendeley** (or ask your agent to run `scripts/search_papers.py --export-ris "01. Literature/references_mendeley.ris"` so you can import them into Mendeley in 1 click).
+2. Export your Mendeley collection as **BibTeX (`.bib`)** or **RIS (`.ris`)**, then ask your agent to run:
+   ```powershell
+   python scripts/build_zotero_map.py --bib "01. Literature/library.bib" --provider mendeley --out "03. Drafts/zotero_map.json"
+   ```
+   *(Or `--ris "01. Literature/library.ris"`).*
+3. `build_thesis_docx.py` automatically matches every in-text APA 7th citation against your Mendeley export and builds a complete, alphabetically sorted APA 7th Reference List (`DAFTAR PUSTAKA`) cleanly—without injecting broken Zotero field codes. *(Note: Modern `Mendeley Cite` for Word 365 uses private Microsoft cloud Content Controls tied to your logged-in Elsevier session, so offline `.docx` generation outputs verified clean APA 7th text & bibliography matching your exact Mendeley library).*
 
 ---
 

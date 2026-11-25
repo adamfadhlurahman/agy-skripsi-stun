@@ -181,8 +181,9 @@ def append_with_italic_phrases(paragraph, text: str, phrases: list[str], size_pt
 
 
 class CitationEngine:
-    def __init__(self, zmap: dict, specs_list: list):
+    def __init__(self, zmap: dict, specs_list: list, provider: str = "zotero"):
         self.zmap = zmap or {}
+        self.provider = (provider or "zotero").strip().lower()
         self.specs = {sp[0]: sp for sp in (specs_list or [])}
         self.emitted_keys: list[str] = []
         if self.specs:
@@ -238,12 +239,18 @@ class CitationEngine:
                 _, item_tuples, prefix, field_display = spec
             if prefix:
                 set_run_font(paragraph.add_run(prefix), size_pt=size_pt, bold=base_bold, italic=base_italic)
-            payload = self.build_csl_payload(field_display, item_tuples)
-            add_fld_char(paragraph, "begin", size_pt=size_pt)
-            add_instr_text(paragraph, f" ADDIN ZOTERO_ITEM CSL_CITATION {json.dumps(payload, ensure_ascii=False)} ", size_pt=size_pt)
-            add_fld_char(paragraph, "separate", size_pt=size_pt)
-            set_run_font(paragraph.add_run(field_display), size_pt=size_pt, bold=base_bold, italic=base_italic)
-            add_fld_char(paragraph, "end", size_pt=size_pt)
+            if self.provider in ("mendeley", "apa_static", "static"):
+                for tup in item_tuples:
+                    if tup[0] not in self.emitted_keys:
+                        self.emitted_keys.append(tup[0])
+                set_run_font(paragraph.add_run(field_display), size_pt=size_pt, bold=base_bold, italic=base_italic)
+            else:
+                payload = self.build_csl_payload(field_display, item_tuples)
+                add_fld_char(paragraph, "begin", size_pt=size_pt)
+                add_instr_text(paragraph, f" ADDIN ZOTERO_ITEM CSL_CITATION {json.dumps(payload, ensure_ascii=False)} ", size_pt=size_pt)
+                add_fld_char(paragraph, "separate", size_pt=size_pt)
+                set_run_font(paragraph.add_run(field_display), size_pt=size_pt, bold=base_bold, italic=base_italic)
+                add_fld_char(paragraph, "end", size_pt=size_pt)
             pos = m.end()
         if pos < len(text):
             append_non_citation_markdown(paragraph, text[pos:], size_pt=size_pt, base_bold=base_bold, base_italic=base_italic)
@@ -1152,7 +1159,7 @@ class BibHTMLParser(HTMLParser):
             self.segments.append((data, self.bold, self.italic))
 
 
-def add_daftar_pustaka(doc, cfg: dict, zmap: dict, cited_keys: list[str]):
+def add_daftar_pustaka(doc, cfg: dict, zmap: dict, cited_keys: list[str], provider: str = "zotero"):
     sec = doc.add_section(WD_SECTION.NEW_PAGE)
     configure_chapter_section(sec, start_decimal=None, first_page_bottom=True)
     add_top_spacer(doc)
@@ -1163,15 +1170,20 @@ def add_daftar_pustaka(doc, cfg: dict, zmap: dict, cited_keys: list[str]):
     locale = cfg.get("zotero", {}).get("locale", "id-ID")
     bib_runs_list = []
     if keys:
-        try:
-            url = f"http://127.0.0.1:23119/api/users/{uid}/items?itemKey={','.join(keys)}&format=bib&style=apa&locale={locale}"
-            with urllib.request.urlopen(urllib.request.Request(url), timeout=4) as resp:
-                entries = [m.strip() for m in re.findall(r'<div class="csl-entry">(.*?)</div>', resp.read().decode("utf-8"), re.S)]
-            for eh in entries:
-                p = BibHTMLParser()
-                p.feed(html.unescape(eh))
-                bib_runs_list.append(p.segments)
-        except Exception:
+        fetched_zot = False
+        if provider == "zotero":
+            try:
+                url = f"http://127.0.0.1:23119/api/users/{uid}/items?itemKey={','.join(keys)}&format=bib&style=apa&locale={locale}"
+                with urllib.request.urlopen(urllib.request.Request(url), timeout=4) as resp:
+                    entries = [m.strip() for m in re.findall(r'<div class="csl-entry">(.*?)</div>', resp.read().decode("utf-8"), re.S)]
+                for eh in entries:
+                    p = BibHTMLParser()
+                    p.feed(html.unescape(eh))
+                    bib_runs_list.append(p.segments)
+                fetched_zot = bool(bib_runs_list)
+            except Exception:
+                fetched_zot = False
+        if not fetched_zot:
             def _fmt_authors_apa(authors: list[dict]) -> str:
                 parts = []
                 for a in authors:
@@ -1234,13 +1246,13 @@ def add_daftar_pustaka(doc, cfg: dict, zmap: dict, cited_keys: list[str]):
         bp.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         bp.paragraph_format.left_indent = Cm(1.27); bp.paragraph_format.first_line_indent = Cm(-1.27)
         bp.paragraph_format.line_spacing = 1.0; bp.paragraph_format.space_after = Pt(12)
-        if idx == 0:
+        if idx == 0 and provider == "zotero":
             add_fld_char(bp, "begin", size_pt=12)
             add_instr_text(bp, ' ADDIN ZOTERO_BIBL {"uncited":[],"omitted":[],"custom":[]} CSL_BIBLIOGRAPHY ', size_pt=12)
             add_fld_char(bp, "separate", size_pt=12)
         for txt, is_b, is_i in segs:
             set_run_font(bp.add_run(txt), size_pt=12, bold=is_b, italic=is_i)
-        if idx == len(bib_runs_list) - 1:
+        if idx == len(bib_runs_list) - 1 and provider == "zotero":
             add_fld_char(bp, "end", size_pt=12)
 
 
@@ -1378,7 +1390,13 @@ def main():
             print(f"AUTO-ZOTERO: Matched {len(specs)} citation patterns -> {specs_path.name}")
     else:
         specs = []
-    cit_engine = CitationEngine(zmap, specs)
+    cit_provider = (
+        cfg.get("citation_provider")
+        or cfg.get("zotero", {}).get("provider")
+        or zmap.get("provider")
+        or "zotero"
+    ).strip().lower()
+    cit_engine = CitationEngine(zmap, specs, provider=cit_provider)
 
     tmp_tpl = ws_root / "04. Output DOCX" / f"_base_{mode}.docx"
     prepare_base_template(cfg, mode, tmp_tpl, ws_root)
@@ -1402,7 +1420,7 @@ def main():
     for ch in chapters:
         render_chapter(doc, ch, cfg, cit_engine, ws_root, is_first=(ch["num"] == 1))
 
-    add_daftar_pustaka(doc, cfg, zmap, cit_engine.emitted_keys)
+    add_daftar_pustaka(doc, cfg, zmap, cit_engine.emitted_keys, provider=cit_provider)
     add_appendices_section(doc, cfg, mode, cit_engine, ws_root)
     if mode == "thesis":
         add_daftar_riwayat_hidup(doc, cfg)
@@ -1413,7 +1431,7 @@ def main():
     doc.save(str(out_path))
     if tmp_tpl.exists():
         tmp_tpl.unlink()
-    print(f"OK: Built {mode.upper()} DOCX -> {out_path} ({len(cit_engine.emitted_keys)} Zotero items)")
+    print(f"OK: Built {mode.upper()} DOCX -> {out_path} ({len(cit_engine.emitted_keys)} {cit_provider} items)")
 
 
 if __name__ == "__main__":

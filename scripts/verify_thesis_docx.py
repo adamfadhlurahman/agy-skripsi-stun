@@ -16,12 +16,13 @@ def w(t: str) -> str:
     return f"{{{W_NS}}}{t}"
 
 
-def verify_docx(docx_path: pathlib.Path, mode: str, require_keaslian: bool = True) -> None:
+def verify_docx(docx_path: pathlib.Path, mode: str, require_keaslian: bool = True, provider: str = "zotero") -> None:
     assert docx_path.exists(), f"Target DOCX missing: {docx_path}"
     with zipfile.ZipFile(docx_path, "r") as z:
-        assert "docProps/custom.xml" in z.namelist(), "Missing docProps/custom.xml (ZOTERO_PREF_1)"
-        custom_txt = z.read("docProps/custom.xml").decode("utf-8", errors="replace")
-        assert "ZOTERO_PREF_1" in custom_txt, "Missing ZOTERO_PREF_1 in custom.xml"
+        if provider == "zotero":
+            assert "docProps/custom.xml" in z.namelist(), "Missing docProps/custom.xml (ZOTERO_PREF_1)"
+            custom_txt = z.read("docProps/custom.xml").decode("utf-8", errors="replace")
+            assert "ZOTERO_PREF_1" in custom_txt, "Missing ZOTERO_PREF_1 in custom.xml"
 
         doc = etree.fromstring(z.read("word/document.xml"))
         body = doc.find(w("body"))
@@ -83,7 +84,7 @@ def verify_docx(docx_path: pathlib.Path, mode: str, require_keaslian: bool = Tru
         assert len(sects) >= min_sects, f"Expected >= {min_sects} sections for {mode}, got {len(sects)}"
 
         blips = [el for el in doc.iter() if el.tag.endswith("}blip")]
-        print(f"[PASS] {docx_path.name} ({mode}):")
+        print(f"[PASS] {docx_path.name} ({mode}, provider={provider}):")
         print(f"       - Sections: {len(sects)} | Images: {len(blips)} | H2: {len(subbabs)} | H3: {len(bsubbabs)} | H4: {len(l4s)} | H5: {len(l5s)}")
         print(f"       - Live fields: {toc_fields} TOC | {seq_fields} SEQ | {zot_items} ZOTERO_ITEM | {zot_bibl} ZOTERO_BIBL")
         print("       - Forbidden first/second-person pronouns: 0")
@@ -96,10 +97,15 @@ def main() -> None:
     args = parser.parse_args()
     mode = "thesis" if args.mode in ("thesis", "skripsi") else "proposal"
 
-    cfg = json.loads(args.config.read_text(encoding="utf-8"))
+    cfg_path = args.config.resolve()
+    cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+    zmap_rel = cfg.get("zotero", {}).get("map_file", "")
+    zmap_p = (cfg_path.parent / zmap_rel) if zmap_rel else None
+    zmap = json.loads(zmap_p.read_text(encoding="utf-8")) if (zmap_p and zmap_p.exists()) else {}
+    provider = (cfg.get("citation_provider") or cfg.get("zotero", {}).get("provider") or zmap.get("provider") or "zotero").strip().lower()
     out_key = "output_proposal_docx" if mode == "proposal" else "output_skripsi_docx"
     req_keaslian = cfg.get("skripsi", {}).get("include_keaslian_page", True)
-    verify_docx(args.config.resolve().parent / cfg["paths"][out_key], mode, require_keaslian=req_keaslian)
+    verify_docx(cfg_path.parent / cfg["paths"][out_key], mode, require_keaslian=req_keaslian, provider=provider)
 
 
 if __name__ == "__main__":

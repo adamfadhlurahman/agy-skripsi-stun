@@ -18,7 +18,7 @@ Designed specifically for **complete beginners with zero prior knowledge of AI a
 2. **Install Core Prerequisites (One-Time Setup):**
    - Install **Python 3.10+** (check *"Add Python to PATH"* on Windows).
    - Run `scripts/setup.ps1` (Windows) or `bash scripts/setup.sh` (macOS/Linux)—or ask your AI agent to run it automatically.
-   - *(Recommended)* Install **Zotero Desktop** so citations and your Reference List update live inside Microsoft Word (works cleanly offline too with automatic APA 7th fallback).
+   - *(Optional)* Use **Zotero Desktop** (live Word fields) or **Mendeley** (via `.bib` / `.ris` export)—or skip both and rely on built-in `search_papers.py` + automatic APA 7th formatting.
 3. **Say Hello in Your Agent Chat:**
    > *"Halo, aku baru mau mulai menyusun skripsi dari nol dan belum punya ide topik sama sekali. Tolong cek kesiapan laptopku dan pandu langkah demi langkah."*
 4. **Follow the Guided Workflow (Phase 0 to Phase 7):**
@@ -46,7 +46,7 @@ Your AI agent detects what you already have (or asks in the first chat) and **au
 | **Phase 0** | Automatic Python/Zotero readiness check, existing-file scan, & student/program profile (`thesis_config.json`). | Always runs in 1 minute |
 | **Phase 1A ("From Minus")** | If you have no idea yet, your agent explores your favorite courses, past project experience, and open datasets -> 3–5 topic options. | Yes (no idea yet) |
 | **Phase 1B (Gap Testing)** | Tests your top 1–2 candidate titles across 3 gates (open gap, contribution, feasibility) and locks 1 Title + Thesis Archetype. | Yes (rough idea) |
-| **Phase 2 (Literature & Zotero)** | Collects peer-reviewed papers and regulations into `01. Literature/`, builds a Literature Triage Matrix, and links Zotero. | Yes (approved title) |
+| **Phase 2 (Literature & Citations)** | Finds peer-reviewed papers via built-in OpenAlex/CrossRef search (`search_papers.py`), builds a Literature Matrix, and syncs **Zotero or Mendeley**. | Yes (approved title) |
 | **Phase 3 (Voice Calibration)** | Analyzes 1–2 of your own past writing samples (`05. Voice Reference/` or your existing chapters) so prose sounds like you. | Auto-runs before drafting |
 | **Phase 4 (Research Blueprint)** | Locks Research Questions, Operational Definitions, Data Map, and Subchapter Outline in `03. Drafts/Thesis Blueprint.md`. | Yes (existing outline/notes) |
 | **Phase 5 (Proposal Chapters I–III)** | Imports/aligns your existing Blueprint (if provided), drafts Chapters I–III, runs formatting/anti-AI/n-gram audits, and exports `Proposal_Thesis.docx`. | Yes (existing Blueprint) |
@@ -63,7 +63,7 @@ Your AI agent detects what you already have (or asks in the first chat) and **au
 * `04. Output DOCX/` — Built `Proposal_Thesis.docx` and `Complete_Thesis.docx` files.
 * `05. Voice Reference/` — Place 1–2 of your own earlier essays/papers here for style calibration.
 * `.agents/skills/` — **16 local AGY skills pre-bundled** out of the box (no manual plugin installation required).
-* `scripts/` — Ready-to-run Python utilities (setup checker, built-in OpenAlex/CrossRef paper finder, voice extractor, manuscript auditor, Zotero sync, `.docx` builder, and verifier).
+* `scripts/` — Ready-to-run Python utilities (`search_papers.py` for OpenAlex/CrossRef + OA PDFs, `build_zotero_map.py` for hybrid Zotero & Mendeley `.bib`/`.ris`, voice extractor, manuscript auditor, `.docx` builder, and verifier).
 * `templates/` — Clean blank Word template conforming to the latest STUN formatting standards.
 
 ---
