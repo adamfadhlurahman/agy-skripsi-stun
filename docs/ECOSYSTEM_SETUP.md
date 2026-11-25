@@ -1,13 +1,15 @@
 # Research Ecosystem Setup (Built-In & Optional Add-Ons)
 
-## 1. What Works Out of the Box?
+## 1. What Works Out of the Box (From ZIP Alone, Zero MCP Needed)?
 
-This starter kit **bundles 16 local skills directly** inside `.agents/skills/`, so they work immediately when you open the folder in Antigravity—no manual plugin installation required:
+This starter kit **works immediately right after extracting the ZIP**—no manual plugin or external MCP installation required:
 
-* **PKN STAN Orchestration & Standards:** `thesis-autopilot`, `pkn-stan-thesis-writer`, `humanizer-indonesia` (+ `scripts/metrik.py`)
-* **Ideation & Gap Testing:** `research-ideation`, `gap-to-topic`, `research-design-helper`
-* **Literature & Peer Review:** `lit-review-assistant`, `literature-triage-matrix`, `paper-summarize`, `paper-review`
-* **Data Analysis & Publication Figures:** `working-with-data`, `python-panel-data`, `r-econometrics`, `stata-data-cleaning`, `stata-regression`, `econ-visualization`
+* **16 Local Skills Bundled Inside `.agents/skills/`:**
+  * **PKN STAN Orchestration & Standards:** `thesis-autopilot`, `pkn-stan-thesis-writer`, `humanizer-indonesia` (+ `scripts/metrik.py`)
+  * **Ideation & Gap Testing:** `research-ideation`, `gap-to-topic`, `research-design-helper`
+  * **Literature & Peer Review:** `lit-review-assistant`, `literature-triage-matrix`, `paper-summarize`, `paper-review`
+  * **Data Analysis & Publication Figures:** `working-with-data`, `python-panel-data`, `r-econometrics`, `stata-data-cleaning`, `stata-regression`, `econ-visualization`
+* **Built-In Academic Paper Search (`scripts/search_papers.py`):** Uses Python's standard library to query **OpenAlex & CrossRef** (no API key or MCP required), verify real DOIs/citation counts/abstracts, download legal Open Access PDFs directly to `01. Literature/`, and export CSL-JSON to `03. Drafts/zotero_map.json`.
 
 ---
 
@@ -37,13 +39,12 @@ python scripts/setup_check.py
 
 ---
 
-## 4. Optional MCP Servers (Extra Research Power)
+## 4. Optional MCP Servers (Extra Research Power for Advanced Users)
 
-If you want AGY to search and download journal PDFs directly or cross-check facts against NotebookLM from chat, you can add these MCP servers to your global AGY config (`~/.gemini/config/mcp_config.json`):
+Even **without any MCP server**, your AI agent can already find real peer-reviewed papers via `scripts/search_papers.py` (OpenAlex & CrossRef), search regulations via web search, and read local PDFs in `01. Literature/`.
 
-1. **`paper-search`** (`https://github.com/openags/paper-search-mcp`) — Search & download PDFs from arXiv, Semantic Scholar, CrossRef, OpenAlex, SSRN, etc.
-2. **`zotero`** (`https://github.com/54yyyu/zotero-mcp`) — Read/write Zotero collections, items, tags, and annotations from chat.
-3. **`notebooklm-mcp`** — Upload key PDFs to NotebookLM for cross-document Q&A and verification.
-4. **`openecon-data`** — Query macroeconomic and financial time series (FRED, World Bank, IMF, etc.).
+If you want extra direct API integrations inside Antigravity (`~/.gemini/config/mcp_config.json`) or Claude Code (`.mcp.json`), you may optionally install these external MCP servers later:
 
-*(Even without external MCP servers, AGY can still search via web search and work fully with PDFs stored in `01. Literature/`.)*
+1. **`paper-search`** (`https://github.com/openags/paper-search-mcp`) — Extended multi-database search (arXiv, Semantic Scholar, CrossRef, OpenAlex, PubMed, SSRN).
+2. **`zotero`** (`https://github.com/54yyyu/zotero-mcp`) — Read/write Zotero collections, items, tags, and annotations directly from chat.
+3. **`openecon-data`** / **`notebooklm-mcp`** — Optional macro-economic time-series API and NotebookLM cross-document Q&A (requires external MCP installation/auth).

@@ -63,7 +63,7 @@ Your AI agent detects what you already have (or asks in the first chat) and **au
 * `04. Output DOCX/` — Built `Proposal_Thesis.docx` and `Complete_Thesis.docx` files.
 * `05. Voice Reference/` — Place 1–2 of your own earlier essays/papers here for style calibration.
 * `.agents/skills/` — **16 local AGY skills pre-bundled** out of the box (no manual plugin installation required).
-* `scripts/` — Ready-to-run Python utilities (setup checker, voice extractor, manuscript auditor, Zotero sync, `.docx` builder, and verifier).
+* `scripts/` — Ready-to-run Python utilities (setup checker, built-in OpenAlex/CrossRef paper finder, voice extractor, manuscript auditor, Zotero sync, `.docx` builder, and verifier).
 * `templates/` — Clean blank Word template conforming to the latest STUN formatting standards.
 
 ---

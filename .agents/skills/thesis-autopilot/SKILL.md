@@ -75,7 +75,7 @@ Read [`references/program_and_data_catalog.md`](./references/program_and_data_ca
 
 Internally activate **`gap-to-topic`** for the student's **top 1–2 candidates**:
 
-1. Run real literature searches (`paper-search` MCP if active, otherwise built-in `search_web` + Google Scholar/Garuda/JDIH/BPS PDFs). **Never** execute `research-hub` CLI commands or Node.js `.js` scripts (`dossier_to_docx.js` / `brief_to_docx.js`)—save all dossiers cleanly as Markdown in `.research/topic_dossier.md` and note search coverage limits transparently.
+1. Run real literature searches (`paper-search` MCP if active; otherwise **built-in zero-MCP `python scripts/search_papers.py --query "<topic>" --limit 10`** for OpenAlex/CrossRef peer-reviewed DOIs, abstracts, and citation counts, plus `search_web` for Indonesian regulations/JDIH/BPS). **Never** execute `research-hub` CLI commands or Node.js `.js` scripts (`dossier_to_docx.js` / `brief_to_docx.js`)—save all dossiers cleanly as Markdown in `.research/topic_dossier.md` and note search coverage limits transparently.
 2. Evaluate **3 Decision Gates**:
    - **Gate 1 (Open?):** Has this exact angle already been published in recent Indonesian/international journals?
    - **Gate 2 (Contribution?):** What clear value does it add (new period, PMK/policy instrument, metric, or locus)?
@@ -91,12 +91,13 @@ Internally activate **`gap-to-topic`** for the student's **top 1–2 candidates*
 Activate **`lit-review-assistant`**, **`literature-triage-matrix`**, and **`paper-summarize`**.
 
 1. Gather recent peer-reviewed journals (5–10 years), official regulations (`JDIH Kemenkeu` / `peraturan.bpk.go.id`), and institutional reports into `01. Literature/` named cleanly (e.g., `Author (Year) - Short Title.pdf`).
-2. Guide the student to turn on Zotero Desktop & Local API, create a thesis collection (e.g., `Skripsi`), add all references, and run:
+   - When `paper-search` MCP is unavailable, run `python scripts/search_papers.py --query "<keywords>" --from-year 2016 --download-oa --export-zotero "03. Drafts/zotero_map.json"` (or `--doi "<doi>"`) to discover verified OpenAlex/CrossRef papers, automatically download legal Open Access PDFs into `01. Literature/`, and populate `03. Drafts/zotero_map.json`.
+2. Guide the student to turn on Zotero Desktop & Local API (if installed), create a thesis collection (e.g., `Skripsi`), add all references, and run:
    ```powershell
    python scripts/build_zotero_map.py --list-collections
    python scripts/build_zotero_map.py --collection-name "Skripsi" --out "03. Drafts/zotero_map.json"
    ```
-   *(Or use `--csl-json` export fallback if Local API is unavailable).*
+   *(If Zotero Desktop is closed or not installed, `scripts/search_papers.py --export-zotero` or `--csl-json` already populates `03. Drafts/zotero_map.json` cleanly, and `build_thesis_docx.py` formats a full APA 7th bibliography automatically).*
 3. Build **`.research/literature_matrix.md`** via `literature-triage-matrix` comparing author, year, method, data/sample, core findings, and limitations.
 4. *(Optional)* If `notebooklm-mcp` is active, upload key PDFs for cross-document fact verification.
 
