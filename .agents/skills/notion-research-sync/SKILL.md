@@ -18,14 +18,18 @@ Ask once during Phase 0:
 
 ### If Student Chooses Notion:
 1. Check if a Notion MCP server (`notion-local` or Notion official MCP) is already available in the current AI client.
-2. **If Notion MCP is active:** Ask the student to paste the URL of their **duplicated Notion Research Dashboard page**, then discover/inspect its 5 inline databases and store their `database_id` / `data_source_id` in `thesis_config.json` under `integrations.notion`.
-3. **If Notion MCP is NOT active (Zero-MCP fallback via `scripts/sync_notion.py`):**
+2. **Important Template Structure Note (`Backend Data Vault` vs `Command Hub`):**
+   - The duplicated Notion template separates the **Backend Data Vault** (`[Databases] — Researcher`, holding the 5 master source databases) from the **Frontend Command Hub** (which shows linked views + widgets).
+   - Always instruct the student to click **`... -> Connections -> Connect to`** at the **Top Root Page** (`Researcher — ...`) so both child pages inherit access cleanly.
+   - Always read/write to the **5 master databases inside `[Databases] — Researcher`**, never directly to frontend linked-view blocks—Notion updates all linked views on the Command Hub automatically.
+3. **If Notion MCP is active:** Ask the student to paste the URL of their **duplicated Notion Root Page** (or `[Databases] — Researcher`), then discover the 5 master databases inside `[Databases] — Researcher` and store their `database_id` / `data_source_id` in `thesis_config.json` under `integrations.notion`.
+4. **If Notion MCP is NOT active (Zero-MCP fallback via `scripts/sync_notion.py`):**
    - Guide the student in 3 plain steps:
      1. Open `https://www.notion.so/my-integrations` -> create an Internal Integration (`AGY Thesis Sync`) and copy the token (`ntn_...` / `secret_...`).
-     2. Open their duplicated Notion Research Dashboard -> click **`...` (top right) -> Connections -> Connect to -> AGY Thesis Sync**.
+     2. Open the **Top Root Page** of their duplicated Notion template -> click **`...` (top right) -> Connections -> Connect to -> AGY Thesis Sync**.
      3. Paste the token into a local `.env` file as `NOTION_TOKEN=...` (already excluded by `.gitignore`) and share their duplicated Notion page URL, then run:
         ```powershell
-        python scripts/sync_notion.py discover --page "<DUPLICATED_DASHBOARD_URL>" --config thesis_config.json
+        python scripts/sync_notion.py discover --page "<DUPLICATED_ROOT_OR_DB_VAULT_URL>" --config thesis_config.json
         ```
 
 ### If Student Chooses Obsidian:

@@ -72,23 +72,35 @@ def notion_req(method: str, path: str, token: str, body: dict | None = None) -> 
 
 def _collect_child_databases(block_id: str, token: str, depth: int = 0) -> dict[str, str]:
     found: dict[str, str] = {}
-    if depth > 3:
+    if depth > 4:
         return found
     cursor = None
+    child_pages: list[tuple[int, str]] = []
     while True:
         qs = f"?page_size=100{f'&start_cursor={cursor}' if cursor else ''}"
-        res = notion_req("GET", f"/blocks/{block_id}/children{qs}", token)
+        try:
+            res = notion_req("GET", f"/blocks/{block_id}/children{qs}", token)
+        except RuntimeError:
+            return found
         for blk in res.get("results", []):
             btype = blk.get("type", "")
             if btype == "child_database":
                 title = (blk.get("child_database") or {}).get("title", "").strip()
-                if title:
+                if title and title.lower() != "untitled":
                     found[title] = blk["id"]
-            if blk.get("has_children") and btype not in ("child_page", "child_database"):
+            elif btype == "child_page" and depth < 2:
+                ptitle = ((blk.get("child_page") or {}).get("title") or "").lower()
+                prio = 0 if ("database" in ptitle or "vault" in ptitle) else 1
+                child_pages.append((prio, blk["id"]))
+            elif blk.get("has_children") and btype not in ("child_page", "child_database"):
                 found.update(_collect_child_databases(blk["id"], token, depth + 1))
         if not res.get("has_more"):
             break
         cursor = res.get("next_cursor")
+    for _, cp_id in sorted(child_pages, key=lambda x: x[0]):
+        found.update(_collect_child_databases(cp_id, token, depth + 1))
+        if len([k for k in found if _classify_db_key(k)]) >= 5:
+            break
     return found
 
 
@@ -118,8 +130,20 @@ def cmd_discover(cfg_path: pathlib.Path, page_ref: str, token: str) -> None:
     page_id = extract_notion_id(page_ref)
     dbs = _collect_child_databases(page_id, token)
 
-    # Also search accessible databases in case linked views point to sibling DBs
-    if len(dbs) < 5:
+    # If user pasted the frontend Command Hub sub-page, check its sibling pages under the parent root first
+    if len([k for k in dbs if _classify_db_key(k)]) < 5:
+        try:
+            page_meta = notion_req("GET", f"/pages/{page_id}", token)
+            parent = page_meta.get("parent") or {}
+            if parent.get("type") == "page_id" and parent.get("page_id"):
+                sibling_dbs = _collect_child_databases(parent["page_id"], token)
+                for k, v in sibling_dbs.items():
+                    dbs.setdefault(k, v)
+        except RuntimeError:
+            pass
+
+    # Fallback: search accessible databases in case linked views point to sibling DBs
+    if len([k for k in dbs if _classify_db_key(k)]) < 5:
         sr = notion_req("POST", "/search", token, {"filter": {"property": "object", "value": "database"}, "page_size": 50})
         for obj in sr.get("results", []):
             t = "".join(p.get("plain_text", "") for p in obj.get("title", [])).strip()
