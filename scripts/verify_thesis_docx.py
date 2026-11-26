@@ -16,13 +16,24 @@ def w(t: str) -> str:
     return f"{{{W_NS}}}{t}"
 
 
-def verify_docx(docx_path: pathlib.Path, mode: str, require_keaslian: bool = True, provider: str = "zotero") -> None:
+def verify_docx(docx_path: pathlib.Path, mode: str, require_keaslian: bool = True, provider: str = "zotero", expected_author: str | None = None) -> None:
     assert docx_path.exists(), f"Target DOCX missing: {docx_path}"
     with zipfile.ZipFile(docx_path, "r") as z:
         if provider == "zotero":
             assert "docProps/custom.xml" in z.namelist(), "Missing docProps/custom.xml (ZOTERO_PREF_1)"
             custom_txt = z.read("docProps/custom.xml").decode("utf-8", errors="replace")
             assert "ZOTERO_PREF_1" in custom_txt, "Missing ZOTERO_PREF_1 in custom.xml"
+
+        if "docProps/core.xml" in z.namelist():
+            core = etree.fromstring(z.read("docProps/core.xml"))
+            creator = (core.findtext("{http://purl.org/dc/elements/1.1/}creator") or "").strip()
+            lmb = (core.findtext("{http://schemas.openxmlformats.org/package/2006/metadata/core-properties}lastModifiedBy") or "").strip()
+            assert "python" not in creator.lower() and "python" not in lmb.lower(), f"Python leak in DOCX metadata: {creator!r} / {lmb!r}"
+            if expected_author:
+                assert creator == expected_author and lmb == expected_author, f"DOCX metadata mismatch: expected {expected_author!r}, got creator={creator!r}, lastModifiedBy={lmb!r}"
+        if "docProps/app.xml" in z.namelist():
+            app_txt = z.read("docProps/app.xml").decode("utf-8", errors="replace")
+            assert "python-docx" not in app_txt.lower(), "Unexpected python-docx marker in docProps/app.xml"
 
         doc = etree.fromstring(z.read("word/document.xml"))
         body = doc.find(w("body"))
@@ -112,7 +123,8 @@ def main() -> None:
     provider = (cfg.get("citation_provider") or cfg.get("zotero", {}).get("provider") or zmap.get("provider") or "zotero").strip().lower()
     out_key = "output_proposal_docx" if mode == "proposal" else "output_skripsi_docx"
     req_keaslian = cfg.get("skripsi", {}).get("include_keaslian_page", True)
-    verify_docx(cfg_path.parent / cfg["paths"][out_key], mode, require_keaslian=req_keaslian, provider=provider)
+    exp_author = (cfg.get("mahasiswa", {}).get("nama") or "").strip() or None
+    verify_docx(cfg_path.parent / cfg["paths"][out_key], mode, require_keaslian=req_keaslian, provider=provider, expected_author=exp_author)
 
 
 if __name__ == "__main__":

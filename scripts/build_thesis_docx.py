@@ -16,6 +16,7 @@ import secrets
 import string
 import urllib.request
 import zipfile
+from datetime import datetime, timezone
 from html.parser import HTMLParser
 from lxml import etree
 
@@ -647,15 +648,27 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
         ).encode("utf-8")
 
         core_root = etree.fromstring(zin.read("docProps/core.xml"), parser)
+        now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        dt_ns = "http://purl.org/dc/terms/"
+        kw_val = (skr.get("kata_kunci") or "").strip()
+        if kw_val.startswith("[") and kw_val.endswith("]"):
+            kw_val = ""
         for ns, tag, val in [
             (DC_NS, "title", skr["judul"]),
             (DC_NS, "creator", mhs["nama"]),
             (CP_NS, "lastModifiedBy", mhs["nama"]),
             (DC_NS, "description", ""),
+            (CP_NS, "keywords", kw_val),
+            (CP_NS, "revision", "1"),
+            (dt_ns, "created", now_utc),
+            (dt_ns, "modified", now_utc),
         ]:
             el = core_root.find(f"{{{ns}}}{tag}")
             if el is not None:
                 el.text = val
+        lp_el = core_root.find(f"{{{CP_NS}}}lastPrinted")
+        if lp_el is not None:
+            core_root.remove(lp_el)
         new_core_xml = etree.tostring(core_root, xml_declaration=True, encoding="UTF-8", standalone=True)
 
         tmp_docx.parent.mkdir(parents=True, exist_ok=True)

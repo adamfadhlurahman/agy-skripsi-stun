@@ -8,9 +8,44 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import zipfile
+from datetime import datetime, timezone
+from lxml import etree
 
 
-def update_word_fields(docx_path: pathlib.Path) -> None:
+def _sync_core_author(docx_path: pathlib.Path, author_override: str | None = None) -> None:
+    """Keep Last Modified By aligned with Author (student name) after Word COM Save()."""
+    if not docx_path.exists():
+        return
+    dc_ns = "http://purl.org/dc/elements/1.1/"
+    cp_ns = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+    dt_ns = "http://purl.org/dc/terms/"
+    with zipfile.ZipFile(docx_path, "r") as zin:
+        if "docProps/core.xml" not in zin.namelist():
+            return
+        items = {item.filename: (item, zin.read(item.filename)) for item in zin.infolist()}
+    core_root = etree.fromstring(items["docProps/core.xml"][1])
+    creator_el = core_root.find(f"{{{dc_ns}}}creator")
+    target_author = (author_override or (creator_el.text if creator_el is not None else "") or "").strip()
+    if not target_author:
+        return
+    if creator_el is not None:
+        creator_el.text = target_author
+    lmb_el = core_root.find(f"{{{cp_ns}}}lastModifiedBy")
+    if lmb_el is not None:
+        lmb_el.text = target_author
+    mod_el = core_root.find(f"{{{dt_ns}}}modified")
+    if mod_el is not None:
+        mod_el.text = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    new_core = etree.tostring(core_root, xml_declaration=True, encoding="UTF-8", standalone=True)
+    tmp_out = docx_path.with_suffix(".tmp.docx")
+    with zipfile.ZipFile(tmp_out, "w", compression=zipfile.ZIP_DEFLATED) as zout:
+        for fname, (info, data) in items.items():
+            zout.writestr(fname if fname == "docProps/core.xml" else info, new_core if fname == "docProps/core.xml" else data)
+    tmp_out.replace(docx_path)
+
+
+def update_word_fields(docx_path: pathlib.Path, author_override: str | None = None) -> None:
     if sys.platform != "win32" or not (shutil.which("powershell") or shutil.which("pwsh")):
         print(
             "[INFO] Automatic Word field update (Word COM) is only available on Windows with Microsoft Word Desktop. "
@@ -63,6 +98,7 @@ try {{
                 print(f"       Detail: {res.stderr.strip().splitlines()[0]}")
             return
         print(res.stdout.strip())
+        _sync_core_author(docx_path, author_override=author_override)
     finally:
         ps_path.unlink(missing_ok=True)
 
@@ -70,8 +106,9 @@ try {{
 def main() -> None:
     parser = argparse.ArgumentParser(description="Refresh Word TOC/SEQ/PAGE fields via Microsoft Word COM.")
     parser.add_argument("docx", type=pathlib.Path, help="Path to built .docx file")
+    parser.add_argument("--author", default=None, help="Optional author override for core.xml metadata")
     args = parser.parse_args()
-    update_word_fields(args.docx)
+    update_word_fields(args.docx, author_override=args.author)
 
 
 if __name__ == "__main__":
