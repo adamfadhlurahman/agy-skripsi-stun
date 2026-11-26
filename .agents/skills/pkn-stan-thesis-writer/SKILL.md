@@ -47,15 +47,16 @@ This skill enforces physical typography, complete front-to-back manuscript struc
   4. Statement of Originality (`PERNYATAAN KEASLIAN SKRIPSI`)
   5. Preface / Acknowledgments (`KATA PENGANTAR`)
   6. Table of Contents (`DAFTAR ISI`)
-  7. List of Tables (`DAFTAR TABEL`, if >= 3)
-  8. List of Figures (`DAFTAR GAMBAR`, if >= 3)
-  9. List of Appendices (`DAFTAR LAMPIRAN`, if >= 3)
+  7. List of Tables (`DAFTAR TABEL`, regular non-bold 12pt entries per `PER-9` Lampiran 2; builder shows whenever >= 1 item exists via `list_min_items: 1`, `PER-9` mandates at >= 3)
+  8. List of Figures (`DAFTAR GAMBAR`, regular non-bold 12pt entries per `PER-9` Lampiran 3; builder shows whenever >= 1 item exists)
+  9. List of Appendices (`DAFTAR LAMPIRAN`, regular non-bold 12pt entries per `PER-9` Lampiran 4; builder shows whenever >= 1 item exists)
   10. Abstract (`ABSTRAK`, max **`250` words**, `1.0` spacing, with `Kata kunci`)
 * **Main Body (`3.1.2.1`) — 4 Official PKN STAN Archetypes:**
   1. **Quantitative (Descriptive or Causal):** `PENDAHULUAN` -> `LANDASAN TEORI` -> `METODE PENELITIAN` -> `HASIL PENELITIAN DAN PEMBAHASAN` -> `SIMPULAN DAN SARAN`.
   2. **Qualitative (Case Study or Non-Case Study):** `PENDAHULUAN` -> `LANDASAN TEORI` -> `METODE PENELITIAN` -> `HASIL PENELITIAN DAN PEMBAHASAN` -> `SIMPULAN DAN SARAN`.
   3. **Descriptive Simulation:** `PENDAHULUAN` (incl. methodology) -> `LANDASAN TEORI` (incl. operational criteria) -> `INTI PENELITIAN` -> `HASIL PENELITIAN DAN EVALUASI` -> `SIMPULAN DAN SARAN`.
   4. **Descriptive Design (System Engineering):** `PENDAHULUAN` (incl. methodology) -> `LANDASAN TEORI` (incl. design methodology & tools) -> `ANALISIS SISTEM YANG BERJALAN` -> `RANCANGAN SISTEM YANG DIUSULKAN` -> `SIMPULAN DAN SARAN`.
+  - *Note on `1.6 Sistematika Pembahasan/Penulisan`:* `PER-9` specifies required chapter summaries without prescribing extra chapter-label indentation; format standalone `**BAB I ...**` subheaders flush-left (`0 cm`) above descriptive paragraphs (never `1.27 cm` indented), or use standard bulleted summaries.
 * **Back Matter Order (`3.1.3`):**
   1. References / Bibliography (`DAFTAR PUSTAKA`)
   2. Appendices (instruments, schedules, supporting tables)

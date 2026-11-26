@@ -95,9 +95,10 @@ def get_or_add_xsd(parent, ns_tag, order_list):
     return el
 
 
-def set_run_font(run, size_pt=12, bold=False, italic=False, subscript=False, superscript=False):
+def set_run_font(run, size_pt: float | None = 12, bold: bool | None = False, italic: bool | None = False, subscript=False, superscript=False):
     run.font.name = "Times New Roman"
-    run.font.size = Pt(size_pt)
+    if size_pt is not None:
+        run.font.size = Pt(size_pt)
     run.bold = bold
     run.italic = italic
     run.font.subscript = subscript
@@ -126,14 +127,14 @@ def set_borderless_table(table):
     insert_xsd_order(tblPr, tblBorders, XSD_TBLPR_ORDER)
 
 
-def add_fld_char(paragraph, fld_type, size_pt=12, bold=False):
+def add_fld_char(paragraph, fld_type, size_pt: float | None = 12, bold: bool | None = False):
     r = paragraph.add_run()
     set_run_font(r, size_pt=size_pt, bold=bold)
     r._r.append(parse_xml(f'<w:fldChar {nsdecls("w")} w:fldCharType="{fld_type}"/>'))
     return r
 
 
-def add_instr_text(paragraph, instr_str, size_pt=12, bold=False):
+def add_instr_text(paragraph, instr_str, size_pt: float | None = 12, bold: bool | None = False):
     r = paragraph.add_run()
     set_run_font(r, size_pt=size_pt, bold=bold)
     instr = OxmlElement("w:instrText")
@@ -143,7 +144,7 @@ def add_instr_text(paragraph, instr_str, size_pt=12, bold=False):
     return r
 
 
-def add_field(paragraph, instr_str, placeholder_text="", size_pt=12, bold=False):
+def add_field(paragraph, instr_str, placeholder_text="", size_pt: float | None = 12, bold: bool | None = False):
     add_fld_char(paragraph, "begin", size_pt=size_pt, bold=bold)
     add_instr_text(paragraph, instr_str, size_pt=size_pt, bold=bold)
     add_fld_char(paragraph, "separate", size_pt=size_pt, bold=bold)
@@ -152,7 +153,7 @@ def add_field(paragraph, instr_str, placeholder_text="", size_pt=12, bold=False)
     add_fld_char(paragraph, "end", size_pt=size_pt, bold=bold)
 
 
-def append_non_citation_markdown(paragraph, text, size_pt=12, base_bold=False, base_italic=False):
+def append_non_citation_markdown(paragraph, text, size_pt: float | None = 12, base_bold: bool | None = False, base_italic: bool | None = False):
     toks = re.split(r"(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)", text)
     for tok in toks:
         if not tok:
@@ -287,6 +288,10 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
         ppr = p_el.find(w("pPr"))
         first_r = p_el.find(w("r"))
         rpr = copy.deepcopy(first_r.find(w("rPr"))) if (first_r is not None and first_r.find(w("rPr")) is not None) else None
+        if rpr is not None:
+            col_el = rpr.find(w("color"))
+            if col_el is not None:
+                col_el.set(w("val"), "000000")
         for ch in list(p_el):
             if ch is not ppr:
                 p_el.remove(ch)
@@ -361,14 +366,43 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
                     replace_p(ps[0], [val], apply_italic=(r_idx == 4))
 
         tbl_sig = children[26]
+        tbl_pr = get_or_add_xsd(tbl_sig, w("tblPr"), XSD_TBLPR_ORDER)
+        tbl_w = get_or_add_xsd(tbl_pr, w("tblW"), XSD_TBLPR_ORDER)
+        tbl_w.set(w("w"), "7938"); tbl_w.set(w("type"), "dxa")
+        tbl_ind = get_or_add_xsd(tbl_pr, w("tblInd"), XSD_TBLPR_ORDER)
+        tbl_ind.set(w("w"), "0"); tbl_ind.set(w("type"), "dxa")
+        col_widths = (4422, 3516)  # 7.8 cm + 6.2 cm = 14.0 cm inside margins
+        tbl_grid = tbl_sig.find(w("tblGrid"))
+        if tbl_grid is not None:
+            for idx_gc, gc in enumerate(tbl_grid.findall(w("gridCol"))[:2]):
+                gc.set(w("w"), str(col_widths[idx_gc]))
         sig_tcs = tbl_sig.findall(f"./{w('tr')}[1]/{w('tc')}")
         if len(sig_tcs) >= 2:
+            for idx_tc, tc in enumerate(sig_tcs[:2]):
+                tc_pr = tc.find(w("tcPr"))
+                if tc_pr is not None:
+                    tc_w = tc_pr.find(w("tcW"))
+                    if tc_w is not None:
+                        tc_w.set(w("w"), str(col_widths[idx_tc])); tc_w.set(w("type"), "dxa")
+                for p_cell in tc.findall(f"./{w('p')}"):
+                    ppr_c = get_or_add_xsd(p_cell, w("pPr"), XSD_PPR_ORDER)
+                    old_ind = ppr_c.find(w("ind"))
+                    if old_ind is not None:
+                        ppr_c.remove(old_ind)
+                    get_or_add_xsd(ppr_c, w("jc"), XSD_PPR_ORDER).set(w("val"), "left")
             ps0 = sig_tcs[0].findall(f"./{w('p')}")
             ps1 = sig_tcs[1].findall(f"./{w('p')}")
             if len(ps0) >= 6:
+                replace_p(ps0[0], ["Mengetahui", "Ketua Program Studi,"])
                 replace_p(ps0[-2], [pmb["ketua_prodi"]])
                 replace_p(ps0[-1], [f"NIP {pmb['nip_kaprodi']}"])
-            if len(ps1) >= 6:
+            if len(ps1) >= 7:
+                replace_p(ps1[0], ["Menyetujui"])
+                replace_p(ps1[1], ["Dosen Pembimbing,"])
+                replace_p(ps1[-2], [pmb["dosen_pembimbing"]])
+                replace_p(ps1[-1], [f"NIP {pmb['nip_pembimbing']}"])
+            elif len(ps1) >= 6:
+                replace_p(ps1[0], ["Menyetujui", "Dosen Pembimbing,"])
                 replace_p(ps1[-2], [pmb["dosen_pembimbing"]])
                 replace_p(ps1[-1], [f"NIP {pmb['nip_pembimbing']}"])
 
@@ -437,10 +471,22 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
                 styles_root.append(jaw)
                 break
 
+        sub_ind_map = {
+            "JudulSubbab": ("567", "567"),
+            "JudulBagianSubbab": ("794", "794"),
+            "JudulBagianBagian-Subbab": ("1021", "1021"),
+            "JusulSubbagianbagian-subbab": ("1247", "1247"),
+        }
         for sid in ("JudulSubbab", "JudulBagianSubbab"):
-            def _fix_sub_bold(s):
+            def _fix_sub_bold(s, _sid=sid):
                 ppr = get_or_add_xsd(s, w("pPr"), XSD_STYLE_ORDER)
                 get_or_add_xsd(ppr, w("keepNext"), XSD_PPR_ORDER)
+                lv, hv = sub_ind_map[_sid]
+                ind = get_or_add_xsd(ppr, w("ind"), XSD_PPR_ORDER)
+                for k_attr in list(ind.attrib):
+                    del ind.attrib[k_attr]
+                ind.set(w("left"), lv); ind.set(w("hanging"), hv)
+                get_or_add_xsd(ppr, w("jc"), XSD_PPR_ORDER).set(w("val"), "both")
                 rpr = ensure_rpr(s)
                 set_sz(rpr, 24)
                 set_toggle(rpr, "b", True); set_toggle(rpr, "bCs", True)
@@ -448,14 +494,72 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
             patch_style(sid, _fix_sub_bold)
 
         for sid in ("JudulBagianBagian-Subbab", "JusulSubbagianbagian-subbab"):
-            def _fix_sub_reg(s):
+            def _fix_sub_reg(s, _sid=sid):
                 ppr = get_or_add_xsd(s, w("pPr"), XSD_STYLE_ORDER)
                 get_or_add_xsd(ppr, w("keepNext"), XSD_PPR_ORDER)
+                lv, hv = sub_ind_map[_sid]
+                ind = get_or_add_xsd(ppr, w("ind"), XSD_PPR_ORDER)
+                for k_attr in list(ind.attrib):
+                    del ind.attrib[k_attr]
+                ind.set(w("left"), lv); ind.set(w("hanging"), hv)
+                get_or_add_xsd(ppr, w("jc"), XSD_PPR_ORDER).set(w("val"), "both")
                 rpr = ensure_rpr(s)
                 set_sz(rpr, 24)
                 set_toggle(rpr, "b", False); set_toggle(rpr, "bCs", False)
                 set_toggle(rpr, "i", False); set_toggle(rpr, "iCs", False)
             patch_style(sid, _fix_sub_reg)
+
+        for sid, sz_val, jc_val in (
+            ("Tabel", 22, "center"),
+            ("TabelChar", 22, None),
+            ("Gambar", 22, "center"),
+            ("GambarChar", 22, None),
+            ("Lampiran", 24, "left"),
+            ("LampiranChar", 24, None),
+        ):
+            def _fix_caption_style(s, _sz=sz_val, _jc=jc_val):
+                if _jc:
+                    ppr = get_or_add_xsd(s, w("pPr"), XSD_STYLE_ORDER)
+                    get_or_add_xsd(ppr, w("keepNext"), XSD_PPR_ORDER)
+                    get_or_add_xsd(ppr, w("jc"), XSD_PPR_ORDER).set(w("val"), _jc)
+                rpr = ensure_rpr(s)
+                set_sz(rpr, _sz)
+                set_toggle(rpr, "b", True); set_toggle(rpr, "bCs", True)
+                set_toggle(rpr, "i", False); set_toggle(rpr, "iCs", False)
+            patch_style(sid, _fix_caption_style)
+
+        toc_ind_specs = {
+            "TOC1": (0, None),       # Flush left at 0 cm; right tab at 14.0 cm (7938 dxa)
+            "TOC2": (510, 510),      # 1.5 starts at 0 cm; subbab title + wraps at 0.90 cm (510 dxa)
+            "TOC3": (1247, 737),     # 1.5.1 starts at 0.90 cm (under subbab title); wraps at 2.20 cm (1247 dxa)
+            "TOC4": (2154, 907),     # 1.5.1.1 starts at 2.20 cm; wraps at 3.80 cm
+            "TOC5": (2835, 681),
+        }
+        for toc_sid, (toc_left, toc_hang) in toc_ind_specs.items():
+            def _fix_toc_style(s, _l=toc_left, _h=toc_hang):
+                ppr = get_or_add_xsd(s, w("pPr"), XSD_STYLE_ORDER)
+                tabs_el = get_or_add_xsd(ppr, w("tabs"), XSD_PPR_ORDER)
+                for old_t in list(tabs_el):
+                    tabs_el.remove(old_t)
+                t_right = etree.SubElement(tabs_el, w("tab"))
+                t_right.set(w("val"), "right"); t_right.set(w("leader"), "dot"); t_right.set(w("pos"), "7938")
+                sp = get_or_add_xsd(ppr, w("spacing"), XSD_PPR_ORDER)
+                for k_attr in list(sp.attrib):
+                    del sp.attrib[k_attr]
+                sp.set(w("before"), "0"); sp.set(w("after"), "0"); sp.set(w("line"), "240"); sp.set(w("lineRule"), "auto")
+                ind = get_or_add_xsd(ppr, w("ind"), XSD_PPR_ORDER)
+                for k_attr in list(ind.attrib):
+                    del ind.attrib[k_attr]
+                ind.set(w("left"), str(_l))
+                if _h is not None:
+                    ind.set(w("hanging"), str(_h))
+                else:
+                    ind.set(w("firstLine"), "0")
+                rpr = ensure_rpr(s)
+                set_sz(rpr, 24)
+                set_toggle(rpr, "b", False); set_toggle(rpr, "bCs", False)
+                set_toggle(rpr, "i", False); set_toggle(rpr, "iCs", False)
+            patch_style(toc_sid, _fix_toc_style)
 
         def _fix_kutipan(s):
             ppr = get_or_add_xsd(s, w("pPr"), XSD_STYLE_ORDER)
@@ -473,11 +577,19 @@ def prepare_base_template(cfg: dict, mode: str, tmp_docx: pathlib.Path, ws_root:
         # Clean numbering levels 1..4 in abstractNumId=5 to latest STUN spec, and clone per-chapter numIds (101..106)
         num_root = etree.fromstring(zin.read("word/numbering.xml"), parser)
         abs5 = None
+        lvl_ind_map = {"1": ("567", "567"), "2": ("794", "794"), "3": ("1021", "1021"), "4": ("1247", "1247")}
         for anum in num_root.findall(w("abstractNum")):
             if anum.get(w("abstractNumId")) == "5":
                 abs5 = anum
                 for lvl in anum.findall(w("lvl")):
                     ilvl = lvl.get(w("ilvl"))
+                    if ilvl in lvl_ind_map:
+                        ppr_lvl = get_or_add_xsd(lvl, w("pPr"), XSD_LVL_ORDER)
+                        ind_lvl = get_or_add_xsd(ppr_lvl, w("ind"), XSD_PPR_ORDER)
+                        for k_attr in list(ind_lvl.attrib):
+                            del ind_lvl.attrib[k_attr]
+                        lv_n, hv_n = lvl_ind_map[ilvl]
+                        ind_lvl.set(w("left"), lv_n); ind_lvl.set(w("hanging"), hv_n)
                     if ilvl in ("1", "2"):
                         rpr = ensure_rpr(lvl)
                         set_sz(rpr, 24)
@@ -836,6 +948,7 @@ def add_abstrak_page(doc, cfg: dict, ws_root: pathlib.Path):
 
 def count_list_items(cfg: dict, mode: str, ws_root: pathlib.Path) -> tuple[int, int, int]:
     max_ch = 3 if mode == "proposal" else 5
+    fig_map = cfg.get("paths", {}).get("figures", {})
     n_tbl, n_fig = 0, 0
     for ch in cfg["paths"].get("chapters", []):
         if ch["num"] > max_ch:
@@ -843,12 +956,16 @@ def count_list_items(cfg: dict, mode: str, ws_root: pathlib.Path) -> tuple[int, 
         p = ws_root / ch["md"]
         if not p.exists():
             continue
-        for ln in p.read_text(encoding="utf-8").splitlines():
+        lines = p.read_text(encoding="utf-8").splitlines()
+        for idx_l, ln in enumerate(lines):
             s = ln.strip()
-            if re.match(r"^Tabel\s+[IVX]+\.\d+\b", s):
+            nxt = next((lines[j].strip() for j in range(idx_l + 1, len(lines)) if lines[j].strip()), "")
+            if re.match(r"^Tabel\s+[IVX]+\.\d+\b", s) and nxt.startswith("|"):
                 n_tbl += 1
-            elif re.match(r"^Gambar\s+[IVX]+\.\d+\b", s):
-                n_fig += 1
+            else:
+                fig_m = re.match(r"^Gambar\s+([IVX]+)\.(\d+)\b", s)
+                if fig_m and (f"{fig_m.group(1)}.{fig_m.group(2)}" in fig_map or nxt.startswith("![")):
+                    n_fig += 1
     app_key = "proposal_appendices" if mode == "proposal" else "appendices"
     n_app = sum(1 for a in cfg["paths"].get(app_key, []) if (ws_root / a.get("md", "")).exists())
     return n_tbl, n_fig, n_app
@@ -857,16 +974,16 @@ def count_list_items(cfg: dict, mode: str, ws_root: pathlib.Path) -> tuple[int, 
 def add_toc_pages(doc, cfg: dict, mode: str, ws_root: pathlib.Path):
     n_tbl, n_fig, n_app = count_list_items(cfg, mode, ws_root)
     force_all = cfg.get("skripsi", {}).get("always_include_lists", False)
-    min_req = 3
+    min_req = int(cfg.get("skripsi", {}).get("list_min_items", 1))
 
     toc_specs = [
-        ("DAFTAR ISI", ' TOC \\h \\z \\t "JUDUL AWAL,1,JUDUL BAB,1,Judul Subbab,2,Judul Bagian Subbab,3" '),
+        ("DAFTAR ISI", ' TOC \\h \\z \\t "JUDUL AWAL,1,JUDUL BAB,1,Judul Subbab,2,Judul Bagian Subbab,3,Judul Bagian Bagian-Subbab,4" '),
     ]
-    if force_all or (mode == "thesis" and n_tbl >= min_req) or (mode == "proposal" and n_tbl >= min_req):
+    if force_all or n_tbl >= min_req:
         toc_specs.append(("DAFTAR TABEL", ' TOC \\h \\z \\t "Tabel,1" '))
-    if force_all or (mode == "thesis" and n_fig >= min_req) or (mode == "proposal" and n_fig >= min_req):
+    if force_all or n_fig >= min_req:
         toc_specs.append(("DAFTAR GAMBAR", ' TOC \\h \\z \\t "Gambar,1" '))
-    if force_all or (mode == "thesis" and n_app >= min_req) or (mode == "proposal" and n_app >= min_req):
+    if force_all or n_app >= min_req:
         toc_specs.append(("DAFTAR LAMPIRAN", ' TOC \\h \\z \\t "Lampiran,1" '))
 
     for title, instr in toc_specs:
@@ -939,11 +1056,12 @@ def add_seq_caption(doc, style_name, prefix_text, seq_name, title_md):
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT if style_name == "Lampiran" else WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.first_line_indent = Cm(0)
     p.paragraph_format.keep_with_next = True
-    sz = 12 if style_name == "Lampiran" else 11
-    set_run_font(p.add_run(prefix_text), size_pt=sz, bold=True)
-    add_field(p, f" SEQ {seq_name} \\* ARABIC ", "1", size_pt=sz, bold=True)
-    set_run_font(p.add_run(" "), size_pt=sz, bold=True)
-    append_non_citation_markdown(p, title_md, size_pt=sz, base_bold=True)
+    # Leave bold & size unset on caption runs so they inherit bold/size from the
+    # Tabel/Gambar/Lampiran style in body, while Word TOC lists render non-bold 12pt.
+    set_run_font(p.add_run(prefix_text), size_pt=None, bold=None)
+    add_field(p, f" SEQ {seq_name} \\* ARABIC ", "1", size_pt=None, bold=None)
+    set_run_font(p.add_run(" "), size_pt=None, bold=None)
+    append_non_citation_markdown(p, title_md, size_pt=None, base_bold=None)
     return p
 
 
@@ -980,7 +1098,7 @@ def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine
             in_code = not in_code
             i += 1
             continue
-        if in_code or s.startswith("# BAB ") or s.startswith("# Lampiran"):
+        if in_code or re.match(r"^#\s+", s):
             i += 1
             continue
 
@@ -990,6 +1108,7 @@ def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine
                 clean_h = re.sub(r"^\d+(?:\.\d+)+\s+", "", s[len(prefix_h):].strip())
                 p = doc.add_paragraph()
                 p.style = doc.styles[st_name]
+                p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                 if ch_num is not None and 1 <= ch_num <= 6:
                     ppr = get_or_add_xsd(p._p, qn("w:pPr"), XSD_PPR_ORDER)
                     npr = get_or_add_xsd(ppr, qn("w:numPr"), XSD_PPR_ORDER)
@@ -1114,6 +1233,19 @@ def render_markdown_body(doc, raw_md: str, cfg: dict, cit_engine: CitationEngine
             p.paragraph_format.line_spacing = 2.0
             p.paragraph_format.left_indent = Cm(1.90); p.paragraph_format.first_line_indent = Cm(-0.63)
             cit_engine.append_rich_line(p, txt_item, size_pt=12)
+            i += 1
+            continue
+
+        if re.match(r"^(?:\*\*)?BAB\s+[IVX]+\b[^.!?\n]*?(?:\*\*)?$", s) and len(s) <= 95:
+            p = doc.add_paragraph()
+            p.style = doc.styles["~normal"]
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            p.paragraph_format.line_spacing = 2.0
+            p.paragraph_format.first_line_indent = Cm(0)
+            p.paragraph_format.space_before = Pt(6)
+            p.paragraph_format.space_after = Pt(0)
+            p.paragraph_format.keep_with_next = True
+            append_non_citation_markdown(p, s if s.startswith("**") else f"**{s}**", size_pt=12)
             i += 1
             continue
 

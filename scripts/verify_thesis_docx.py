@@ -73,6 +73,13 @@ def verify_docx(docx_path: pathlib.Path, mode: str, require_keaslian: bool = Tru
         for bad_tok in ("Error! Bookmark not defined", "Error! Reference source not found"):
             assert bad_tok not in full_text, f"Unresolved Word error field: {bad_tok}"
 
+        stray_h1 = [
+            "".join(t.text or "" for t in p.findall(f".//{w('t')}")).strip()
+            for p in body.findall(f".//{w('p')}")
+            if re.match(r"^#\s+\S", "".join(t.text or "" for t in p.findall(f".//{w('t')}")).strip())
+        ]
+        assert not stray_h1, f"Stray raw Markdown '# ' heading leaked into DOCX: {stray_h1[:5]}"
+
         bad_pronouns = re.findall(r"\b(?:saya|aku|kami|kita|anda)\b", full_text.lower())
         assert not bad_pronouns, f"Forbidden first/second-person pronouns found: {bad_pronouns[:10]}"
 
